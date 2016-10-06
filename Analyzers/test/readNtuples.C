@@ -38,8 +38,6 @@ double offlineIsoCut = 0.15;
 // ******************************************
 //                                          *
 //                                          *
-int theRunNumber           = 274157;           
-bool L2isfixed             = false;
 std::string hltname        = "HLT_IsoMu20_v3";
 std::string thepassfilter  = L3filter;
 std::string theprobefilter = L1filter;
@@ -94,7 +92,6 @@ void readNtuples(){
   {
     Int_t IgetEvent   = tree   -> GetEvent(eventNo);
     
-    if (! (ev-> runNumber == theRunNumber)) break;
     unsigned int nmuons = ev->muons.size();
     if (nmuons < 2) continue;
     
