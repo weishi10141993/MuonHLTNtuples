@@ -1,6 +1,6 @@
 # MuonHLTNtuples
 
-cmsrel CMSSW_8_0_8_patch1  (-> update to the appropriate CMSSW version!)
+cmsrel CMSSW_8_0_8_patch1  (-> update to the appropriate CMSSW version!)   
 cd CMSSW_8_0_8_patch1/src  
 cmsenv    
 git cms-addpkg HLTrigger/Configuration    
