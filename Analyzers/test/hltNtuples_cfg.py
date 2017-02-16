@@ -31,7 +31,8 @@ process.muonNtuples =cms.EDAnalyzer("MuonNtuples",
                        
                        L3Candidates             = cms.untracked.InputTag("hltL3MuonCandidates"), 
                        L2Candidates             = cms.untracked.InputTag("hltL2MuonCandidates"), 
-                       L1Candidates             = cms.untracked.InputTag("hltGmtStage2Digis", "Muon"), 
+                       L1Candidates             = cms.untracked.InputTag("gmtStage2Digis", "Muon", "RECO"), #if HLT non re-run
+                       #L1Candidates             = cms.untracked.InputTag("hltGmtStage2Digis", "Muon"), # if re-run HLT and L1 emulator
                        TkMuCandidates           = cms.untracked.InputTag("hltHighPtTkMuonCands"), 
                        NeutralDeposit           = cms.untracked.InputTag("hltMuonHcalPFClusterIsoForMuons"), 
                        PhotonsDeposit           = cms.untracked.InputTag("hltMuonEcalPFClusterIsoForMuons"), 
