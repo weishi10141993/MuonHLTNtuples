@@ -22,7 +22,8 @@ parser.add_argument("--outdir", default="test/", help='name of the outputDir')
 parser.add_argument("--queue", default="workday", help='queue name:  espresso (20 min), microcentury (1h), longlunch (2h), workday (8h), tomorrow (1d)')
 parser.add_argument("--clean",action='store_true', help='Clean all the working folders')
 parser.add_argument("--dryrun",action='store_true', help='Do not submit the jobs')
-parser.add_argument("--njobs",type=int, help="Number of jobs, if nothing is specified one job per file will be run")
+parser.add_argument("--nfilesperjob",type=int, help="Number of files per job, if nothing is specified one file per job will be run")
+
 args = parser.parse_args()
 
 if args.clean:
@@ -70,7 +71,7 @@ if args.outputFile is None:
         '-v1_GEN-SIM-DIGI-RAW': '',
         '-v1_RAW': '',
         '-v1_AOD': '',
-        '-v2_RAW-RECO': '',
+        '_RAW-RECO': '',
         '.txt': ''
         }
     robj = re.compile('|'.join(rdict.keys()))
@@ -110,10 +111,9 @@ with open(FileListRECO) as f:
         pass
     NumberOfFiles=i+1
 
-NumberOfJobs=NumberOfFiles
-if args.njobs is not None:
-    NumberOfJobs=args.njobs
-interval=(NumberOfFiles + NumberOfJobs // 2) // NumberOfJobs
+NumberOfFilesPerJob=1
+if args.nfilesperjob is not None:
+    NumberOfFilesPerJob=args.nfilesperjob
 
 queue = args.queue  # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
 ########   customization end   #########
@@ -129,17 +129,26 @@ print
 
 ##### loop for creating and sending jobs #####
 print "Creating jobs for %s" %FileListRECO
-for x in range(1, int(NumberOfJobs)+1):
+import itertools
+NumberOfJobs=0
+with open(FileListRECO) as T:
+    for i, sli in enumerate(iter(lambda:list(itertools.islice(T, NumberOfFilesPerJob)), []), 0):
+        with open("exec/{fld}/{subfld}/list_{n}.txt".format(fld=ScriptFolder,subfld=ScriptNames,n=i), "w") as f:
+            f.writelines(sli)
+            NumberOfJobs+=1
+
+print "Number of jobs created: %s" %NumberOfJobs
+
+for x in range(0, int(NumberOfJobs)):
     ##    with open(FileListRECO) as f:
     ##### creates directory and file list for job #######
-#    print "sed '"+str(1+interval*(x-1))+","+str(interval*x)+"!d' "+FileListRECO+" > exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x)
+                
 #    os.system("sed '"+str(1+interval*(x-1))+","+str(interval*x)+"!d' "+FileListRECO+" > exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x))
 #    inputfiles = "exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x)
 #    scriptname = 'exec/%s/%s/job_%s.sh' %(ScriptFolder,ScriptNames,x)
-    print "sed '"+str(1+interval*(x-1))+","+str(interval*x)+"!d' "+FileListRECO+" > exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x-1)
-    os.system("sed '"+str(1+interval*(x-1))+","+str(interval*x)+"!d' "+FileListRECO+" > exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x-1))
-    inputfiles = "exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x-1)
-    scriptname = 'exec/%s/%s/job_%s.sh' %(ScriptFolder,ScriptNames,x-1)
+#    os.system("sed '"+str(1+interval*(x-1))+","+str(interval*x)+"!d' "+FileListRECO+" > exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x-1))
+    inputfiles = "exec/%s/%s/list_%s.txt" %(ScriptFolder,ScriptNames,x)
+    scriptname = 'exec/%s/%s/job_%s.sh' %(ScriptFolder,ScriptNames,x)
 
     print " ---> %s " %(scriptname)
     ##### creates jobs #######
