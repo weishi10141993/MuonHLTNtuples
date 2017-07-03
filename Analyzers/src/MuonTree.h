@@ -53,14 +53,6 @@ public:
   Float_t photonDep_dR04;
   Float_t puPt_dR04;
 
-  Float_t ecalPFCluster_dR03;
-  Float_t hcalPFCluster_dR03;
-  Float_t trkDep_dR03;
-
-  Float_t ecalPFCluster_dR04;
-  Float_t hcalPFCluster_dR04;
-  Float_t trkDep_dR04;
-
   MuonCand(){};
   virtual ~MuonCand(){};
 
@@ -77,15 +69,6 @@ public:
   Float_t trkpt;         // pt of the track of the hlt muon [GeV]
   Int_t   charge;         // pt of the track of the hlt muon [GeV]
   
-  Float_t ecalDep;
-  Float_t hcalDep;
-  Float_t trkDep;
-
-  Float_t ecalDep05;
-  Float_t hcalDep05;
-  Float_t ecalDep1;
-  Float_t hcalDep1;
-
   HLTMuonCand(){};
   virtual ~HLTMuonCand(){};
 
@@ -135,7 +118,6 @@ class HLTInfo {
 public:
   std::vector<std::string>  triggers;  
   std::vector<HLTObjCand>   objects;   
-  double                    rho;
 
   HLTInfo(){};
   virtual ~HLTInfo(){};
@@ -170,7 +152,6 @@ public:
   Float_t cov_primaryVertex[3][3]; 
 
   Float_t trueNI;   
-  Float_t rho; 
   
   Float_t bxId;
   Float_t instLumi; 
@@ -178,6 +159,8 @@ public:
   std::vector <GenParticleCand> genParticles; 
   std::vector <MuonCand>        muons;         
   std::vector <HLTMuonCand>     tkmuons;      
+  std::vector <HLTMuonCand>     hltOImuons;      
+  std::vector <HLTMuonCand>     hltIOmuons;      
   std::vector <HLTMuonCand>     hltmuons;      
   std::vector <HLTMuonCand>     L2muons;      
   std::vector <L1MuonCand>      L1muons;      

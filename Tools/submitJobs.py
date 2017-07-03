@@ -67,11 +67,11 @@ if args.outputFile is None:
         'fileList/': '',
         '_CMSSW_9_2_0-PU25ns_91X_upgrade2017_realistic_v5': '',
         '_CMSSW_9_2_0-91X_upgrade2017_realistic_v5': '',
-        '-v1_GEN-SIM-RECO': '',
-        '-v1_GEN-SIM-DIGI-RAW': '',
-        '-v1_RAW': '',
-        '-v1_AOD': '',
+        '_GEN-SIM-RECO': '',
+        '_GEN-SIM-DIGI-RAW': '',
         '_RAW-RECO': '',
+        '_RAW': '',
+        '_AOD': '',
         '.txt': ''
         }
     robj = re.compile('|'.join(rdict.keys()))
@@ -180,6 +180,7 @@ with open('submit.sub', 'w') as fout:
     fout.write("output                  = batchlogs/%s_%s$(ClusterId).$(ProcId).out\n" %(ScriptFolder,ScriptNames))
     fout.write("error                   = batchlogs/%s_%s$(ClusterId).$(ProcId).err\n" %(ScriptFolder,ScriptNames))
     fout.write("log                     = batchlogs/%s_%s$(ClusterId).log\n"%(ScriptFolder,ScriptNames))
+#    fout.write('request_cpus            = 4\n')
     fout.write('+JobFlavour = "%s"\n' %(queue))
     fout.write("\n")
     fout.write("queue filename matching (exec/%s/%s/job_*.sh)\n" %(ScriptFolder,ScriptNames))
