@@ -1,4 +1,3 @@
-
 /** \class MuonNtuples
  */
       
@@ -11,7 +10,6 @@
 #include "FWCore/Framework/interface/ConsumesCollector.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
-
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/View.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
@@ -32,18 +30,15 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/Scalers/interface/LumiScalers.h"
-
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "HLTrigger/HLTcore/interface/HLTEventAnalyzerAOD.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
-
 #include <map>
 #include <string>
 #include <iomanip>
 #include "TTree.h"
-
 #include "MuonHLTNtuples/Analyzers/src/MuonTree.h"
 
 
@@ -59,16 +54,9 @@ class MuonNtuples : public edm::EDAnalyzer {
   virtual void beginEvent();
   virtual void beginRun(const edm::Run & run,    const edm::EventSetup & eventSetup);
   virtual void endRun  (const edm::Run & run,    const edm::EventSetup & eventSetup);
-  
-private:
-  enum HLTCollectionType { 
-    L2muons,
-    L3muons,
-    tkmuons,
-    L3OImuons,
-    L3IOmuons,
-  };
-  
+
+ private:
+
   void fillHlt(const edm::Handle<edm::TriggerResults> &, 
                const edm::Handle<trigger::TriggerEvent> &,
                const edm::TriggerNames &,
@@ -83,9 +71,9 @@ private:
 
   void fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> &,
                     const edm::Event   &,
-		    HLTCollectionType type
-		    );
-
+                    bool isL3           ,
+                    bool isTk
+                   );
 
   void fillL1Muons(const edm::Handle<l1t::MuonBxCollection> &,
                     const edm::Event   &
@@ -122,10 +110,6 @@ private:
   edm::EDGetTokenT<l1t::MuonBxCollection> l1candToken_; 
   edm::InputTag tkMucandTag_;
   edm::EDGetTokenT<reco::RecoChargedCandidateCollection> tkMucandToken_; 
-  edm::InputTag l3OIMucandTag_;
-  edm::EDGetTokenT<reco::RecoChargedCandidateCollection> l3OIMucandToken_; 
-  edm::InputTag l3IOMucandTag_;
-  edm::EDGetTokenT<reco::RecoChargedCandidateCollection> l3IOMucandToken_; 
 
   edm::InputTag lumiScalerTag_;
   edm::EDGetTokenT<LumiScalersCollection> lumiScalerToken_;
@@ -171,10 +155,7 @@ MuonNtuples::MuonNtuples(const edm::ParameterSet& cfg):
     l1candToken_            (consumes<l1t::MuonBxCollection>(l1candTag_)),
   tkMucandTag_              (cfg.getUntrackedParameter<edm::InputTag>("TkMuCandidates")),
     tkMucandToken_            (consumes<reco::RecoChargedCandidateCollection>(tkMucandTag_)),
-  l3OIMucandTag_              (cfg.getUntrackedParameter<edm::InputTag>("L3OIMuCandidates")),
-    l3OIMucandToken_            (consumes<reco::RecoChargedCandidateCollection>(tkMucandTag_)),
-  l3IOMucandTag_              (cfg.getUntrackedParameter<edm::InputTag>("L3IOMuCandidates")),
-    l3IOMucandToken_            (consumes<reco::RecoChargedCandidateCollection>(tkMucandTag_)),
+
 
   lumiScalerTag_          (cfg.getUntrackedParameter<edm::InputTag>("lumiScalerTag")),
     lumiScalerToken_        (consumes<LumiScalersCollection>(lumiScalerTag_)), 
@@ -222,7 +203,6 @@ void MuonNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     }
     event_.nVtx = nGoodVtx;
     const reco::Vertex           & pv      = vertices->at(0);
-
 
   // Handle the offline muon collection and fill offline muons
     edm::Handle<std::vector<reco::Muon> > muons;
@@ -296,49 +276,35 @@ void MuonNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
 
 
 
- // Handle the online muon collection and fill online muons
+ // Handle the online muon collection and fill online muons //the hltmuons branch
   edm::Handle<reco::RecoChargedCandidateCollection> l3cands;
   if (event.getByToken(l3candToken_, l3cands))
-    fillHltMuons(l3cands, event, L3muons);
-//  else
-//    edm::LogWarning("") << "Online muon collection not found !!!";
+    fillHltMuons(l3cands, event, true, false);
+  else
+    edm::LogWarning("") << "Online muon collection not found !!!"; 
 
-  // Handle the online muon collection and fill L2 muons
+  // Handle the online muon collection and fill L2 muons //the l2muosn branch
   edm::Handle<reco::RecoChargedCandidateCollection> l2cands;
   if (event.getByToken(l2candToken_, l2cands))
-    fillHltMuons(l2cands, event, L2muons);
-//  else
-//    edm::LogWarning("") << "Online L2 muon collection not found !!!";
+    fillHltMuons(l2cands, event, false, false);
+  else
+    edm::LogWarning("") << "Online L2 muon collection not found !!!";
 
   // Handle the online muon collection and fill L1 muons
   edm::Handle<l1t::MuonBxCollection> l1cands;
   if (event.getByToken(l1candToken_, l1cands))
     fillL1Muons(l1cands, event);
-//  else
-//    edm::LogWarning("") << "Online L1 muon collection not found !!!";
+  else
+    edm::LogWarning("") << "Online L1 muon collection not found !!!";
   
   // Handle the online tk muon collection and fill online muons
   edm::Handle<reco::RecoChargedCandidateCollection> tkMucands;
   if (event.getByToken(tkMucandToken_, tkMucands))
-    fillHltMuons(tkMucands, event, tkmuons);
-//  else
-//    edm::LogWarning("") << "Online tracker muon collection not found !!!";
+    fillHltMuons(tkMucands, event, false, true);
+  else
+    edm::LogWarning("") << "Online tracker muon collection not found !!!";
 
 
-  // Handle the online L3OI muon collection and fill online muons
-  edm::Handle<reco::RecoChargedCandidateCollection> l3OIcands;
-  if (event.getByToken(l3OIMucandToken_, l3OIcands))
-    fillHltMuons(l3OIcands, event, L3OImuons);
-//  else
-//    edm::LogWarning("") << "Online L3OI muon collection not found !!!";
-
-  // Handle the online L3OI muon collection and fill online muons
-  edm::Handle<reco::RecoChargedCandidateCollection> l3IOcands;
-  if (event.getByToken(l3IOMucandToken_, l3IOcands))
-    fillHltMuons(l3IOcands, event, L3IOmuons);
-//  else
-//    edm::LogWarning("") << "Online L3IO muon collection not found !!!";
-  
   // endEvent();
   tree_["muonTree"] -> Fill();
 }
@@ -482,16 +448,40 @@ void MuonNtuples::fillMuons(const edm::Handle<reco::MuonCollection>       & muon
 
     mu1 -> isGlobalMuon  () ? theMu.isGlobal  = 1 : theMu.isGlobal   = 0;
     mu1 -> isTrackerMuon () ? theMu.isTracker = 1 : theMu.isTracker  = 0;
+    mu1 -> isPFMuon()       ? theMu.isPFMuon  = 1 : theMu.isPFMuon   = 0;
 
     muon::isTightMuon ( (*mu1), pv ) ? theMu.isTight  = 1 : theMu.isTight  = 0;
     muon::isLooseMuon ( (*mu1)     ) ? theMu.isLoose  = 1 : theMu.isLoose  = 0;
     muon::isMediumMuon( (*mu1)     ) ? theMu.isMedium = 1 : theMu.isMedium = 0;
-    
+
+
+//**************************************INCLUDED**************************************//  
+
+    if (mu1 -> globalTrack().isNonnull()){
+      theMu.normalizedChi2 = mu1 -> globalTrack() -> normalizedChi2(); //normalized global-track chi2
+      theMu.validHits      = mu1 -> globalTrack() -> hitPattern().numberOfValidHits(); //number of muon-chamber  hit included in the global muon track
+    } 
+
+    if (mu1 -> innerTrack().isNonnull()){
+      theMu.pixelHits         = mu1 -> innerTrack() -> hitPattern().numberOfValidPixelHits()      ; //number of pixel hits
+      theMu.layerHits         = mu1 -> innerTrack() -> hitPattern().trackerLayersWithMeasurement(); //hits per layer
+      theMu.pixelLayers       = mu1 -> innerTrack() -> hitPattern().pixelLayersWithMeasurement()  ; //number of pixel layers
+      theMu.fracValidTrackhit = mu1 -> innerTrack() -> validFraction();  //fraction of valid tracker hits 
+    }
+
+    theMu.dxy               = mu1 -> muonBestTrack() -> dxy();//transverse distance of the tracker track wrt primary vertex
+    theMu.dz                = mu1 -> muonBestTrack() -> dz() ; //longitudinal distance of the tracker track wrt primary vertex
+    theMu.chi2LocalPosition = mu1 -> combinedQuality().chi2LocalPosition; //tracker standalone position match
+    theMu.kickFinder        = mu1 -> combinedQuality().trkKink; //kick finder
+    theMu.matchedStations   = mu1 -> numberOfMatchedStations(); //number of muons stations with segment
+
+
+
+
     theMu.chargedDep_dR03 = mu1->pfIsolationR03().sumChargedHadronPt ;
     theMu.neutralDep_dR03 = mu1->pfIsolationR03().sumNeutralHadronEt ;
     theMu.photonDep_dR03  = mu1->pfIsolationR03().sumPhotonEt        ;
     theMu.puPt_dR03       = mu1->pfIsolationR03().sumPUPt            ;
-
     theMu.chargedDep_dR04 = mu1->pfIsolationR04().sumChargedHadronPt ;
     theMu.neutralDep_dR04 = mu1->pfIsolationR04().sumNeutralHadronEt ;
     theMu.photonDep_dR04  = mu1->pfIsolationR04().sumPhotonEt        ;
@@ -504,32 +494,27 @@ void MuonNtuples::fillMuons(const edm::Handle<reco::MuonCollection>       & muon
 
 
 // ---------------------------------------------------------------------
-void MuonNtuples::fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands ,
+void MuonNtuples::fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands , //candidates to HLT 
                                const edm::Event                                        & event   , 
-			       HLTCollectionType type
+                               bool isL3                                                         ,
+                               bool isTk
                                )
 {
-  
+
   for( unsigned int il3 = 0; il3 < l3cands->size(); ++il3) {
+
     HLTMuonCand theL3Mu;
-    
+
     reco::RecoChargedCandidateRef candref(l3cands, il3);
     theL3Mu.pt      = candref -> pt();
     theL3Mu.eta     = candref -> eta();
     theL3Mu.phi     = candref -> phi();
     theL3Mu.charge  = candref -> charge();
 
+
     reco::TrackRef trkmu = candref->track();
     theL3Mu.trkpt   = trkmu -> pt();
-    
-    switch (type){
-    case L2muons:   event_.L2muons   .push_back(theL3Mu);
-    case L3muons:   event_.hltmuons  .push_back(theL3Mu);
-    case tkmuons:   event_.tkmuons   .push_back(theL3Mu);
-    case L3OImuons: event_.hltOImuons.push_back(theL3Mu);
-    case L3IOmuons: event_.hltIOmuons.push_back(theL3Mu);  
     }
-  }
 }
 
 
@@ -567,8 +552,10 @@ void MuonNtuples::beginEvent()
   event_.hlt.triggers.clear();
   event_.hlt.objects.clear();
 
+
   event_.hltTag.triggers.clear();
   event_.hltTag.objects.clear();
+
 
   event_.genParticles.clear();
   event_.muons.clear();
@@ -585,6 +572,7 @@ void MuonNtuples::beginEvent()
   }
   event_.nVtx       = -1;
   event_.trueNI     = -1;
+ 
   event_.bxId       = -1;
   event_.instLumi   = -1;
   
