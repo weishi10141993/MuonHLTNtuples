@@ -42,7 +42,28 @@ public:
   Int_t   isLoose;
   Int_t   isMedium;
   Int_t   isTight;
-  
+
+
+//***************************INCLUDED*********************//
+  Double_t  normalizedChi2; 
+
+  Int_t validHits;
+
+  Float_t dxy;
+  Float_t dz;
+  Float_t chi2LocalPosition;
+  Float_t kickFinder;
+  Float_t fracValidTrackhit;
+
+  Int_t matchedStations;
+  Int_t pixelHits;
+  Int_t layerHits;
+  Int_t pixelLayers;
+  Int_t isPFMuon;
+
+
+  //******************************************************//
+
   Float_t chargedDep_dR03;
   Float_t neutralDep_dR03;
   Float_t photonDep_dR03;
@@ -68,7 +89,7 @@ public:
   Float_t phi;          
   Float_t trkpt;         // pt of the track of the hlt muon [GeV]
   Int_t   charge;         // pt of the track of the hlt muon [GeV]
-  
+ 
   HLTMuonCand(){};
   virtual ~HLTMuonCand(){};
 
@@ -118,6 +139,7 @@ class HLTInfo {
 public:
   std::vector<std::string>  triggers;  
   std::vector<HLTObjCand>   objects;   
+ 
 
   HLTInfo(){};
   virtual ~HLTInfo(){};
@@ -152,6 +174,7 @@ public:
   Float_t cov_primaryVertex[3][3]; 
 
   Float_t trueNI;   
+
   
   Float_t bxId;
   Float_t instLumi; 
@@ -159,8 +182,6 @@ public:
   std::vector <GenParticleCand> genParticles; 
   std::vector <MuonCand>        muons;         
   std::vector <HLTMuonCand>     tkmuons;      
-  std::vector <HLTMuonCand>     hltOImuons;      
-  std::vector <HLTMuonCand>     hltIOmuons;      
   std::vector <HLTMuonCand>     hltmuons;      
   std::vector <HLTMuonCand>     L2muons;      
   std::vector <L1MuonCand>      L1muons;      
