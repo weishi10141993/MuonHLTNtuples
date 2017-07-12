@@ -182,7 +182,9 @@ public:
   std::vector <GenParticleCand> genParticles; 
   std::vector <MuonCand>        muons;         
   std::vector <HLTMuonCand>     tkmuons;      
-  std::vector <HLTMuonCand>     hltmuons;      
+  std::vector <HLTMuonCand>     hltmuons;     
+  std::vector <HLTMuonCand>     hltOImuons;
+  std::vector <HLTMuonCand>     hltIOmuons;
   std::vector <HLTMuonCand>     L2muons;      
   std::vector <L1MuonCand>      L1muons;      
   HLTInfo                       hlt;           

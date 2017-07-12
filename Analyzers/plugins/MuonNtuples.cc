@@ -41,6 +41,13 @@
 #include "TTree.h"
 #include "MuonHLTNtuples/Analyzers/src/MuonTree.h"
 
+enum HLTCollectionType { 
+  iL2muons=0,
+  iL3muons,
+  itkmuons,
+  iL3OImuons,
+  iL3IOmuons,
+};
 
 class MuonNtuples : public edm::EDAnalyzer {
 
@@ -71,8 +78,7 @@ class MuonNtuples : public edm::EDAnalyzer {
 
   void fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> &,
                     const edm::Event   &,
-                    bool isL3           ,
-                    bool isTk
+		    HLTCollectionType type
                    );
 
   void fillL1Muons(const edm::Handle<l1t::MuonBxCollection> &,
@@ -279,14 +285,14 @@ void MuonNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
  // Handle the online muon collection and fill online muons //the hltmuons branch
   edm::Handle<reco::RecoChargedCandidateCollection> l3cands;
   if (event.getByToken(l3candToken_, l3cands))
-    fillHltMuons(l3cands, event, true, false);
+    fillHltMuons(l3cands, event, HLTCollectionType::iL3muons);
   else
     edm::LogWarning("") << "Online muon collection not found !!!"; 
 
   // Handle the online muon collection and fill L2 muons //the l2muosn branch
   edm::Handle<reco::RecoChargedCandidateCollection> l2cands;
   if (event.getByToken(l2candToken_, l2cands))
-    fillHltMuons(l2cands, event, false, false);
+    fillHltMuons(l2cands, event, HLTCollectionType::iL2muons);
   else
     edm::LogWarning("") << "Online L2 muon collection not found !!!";
 
@@ -297,10 +303,10 @@ void MuonNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   else
     edm::LogWarning("") << "Online L1 muon collection not found !!!";
   
-  // Handle the online tk muon collection and fill online muons
+  // Handle the 2nd online muon collection and fill online muons
   edm::Handle<reco::RecoChargedCandidateCollection> tkMucands;
   if (event.getByToken(tkMucandToken_, tkMucands))
-    fillHltMuons(tkMucands, event, false, true);
+    fillHltMuons(tkMucands, event, HLTCollectionType::itkmuons);
   else
     edm::LogWarning("") << "Online tracker muon collection not found !!!";
 
@@ -496,8 +502,7 @@ void MuonNtuples::fillMuons(const edm::Handle<reco::MuonCollection>       & muon
 // ---------------------------------------------------------------------
 void MuonNtuples::fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> & l3cands , //candidates to HLT 
                                const edm::Event                                        & event   , 
-                               bool isL3                                                         ,
-                               bool isTk
+			       HLTCollectionType type
                                )
 {
 
@@ -514,7 +519,12 @@ void MuonNtuples::fillHltMuons(const edm::Handle<reco::RecoChargedCandidateColle
 
     reco::TrackRef trkmu = candref->track();
     theL3Mu.trkpt   = trkmu -> pt();
-    }
+    if (type == HLTCollectionType::iL3muons)   { event_.hltmuons  .push_back(theL3Mu);  continue; }
+    if (type == HLTCollectionType::iL3OImuons) { event_.hltOImuons.push_back(theL3Mu);  continue; }
+    if (type == HLTCollectionType::iL3IOmuons) { event_.hltIOmuons.push_back(theL3Mu);  continue; }
+    if (type == HLTCollectionType::itkmuons)   { event_.tkmuons   .push_back(theL3Mu);  continue; }
+    if (type == HLTCollectionType::iL2muons)   { event_.L2muons   .push_back(theL3Mu);  continue; }
+  }
 }
 
 
