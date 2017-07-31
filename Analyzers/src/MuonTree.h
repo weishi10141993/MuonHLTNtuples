@@ -26,6 +26,31 @@ public:
 };
 
 
+//INCLUDED2//
+class HltTrackCand {
+ public:
+
+  Float_t pt;
+  Float_t eta;
+  Float_t phi;
+
+  Double_t  chi2;
+
+  Float_t dxy;
+  Float_t dz;
+  Float_t fracValidTrackhit;
+
+  Int_t validHits;
+  Int_t pixelHits;
+  Int_t layerHits;
+  Int_t pixelLayers;
+
+
+  HltTrackCand(){};
+  virtual ~HltTrackCand(){};
+
+  ClassDef(HltTrackCand,1)
+    };
 
 
 class MuonCand {
@@ -45,20 +70,28 @@ public:
 
 
 //***************************INCLUDED*********************//
-  Double_t  normalizedChi2; 
+  Double_t  chi2; 
+  Double_t innerchi2;
 
-  Int_t validHits;
+  Float_t validHits;
+  Float_t innerpt;
+  Float_t innereta;
+  Float_t innerphi;
+  Float_t innerdxy;
+  Float_t innerdz;
+
+  Int_t innervalidHits;
 
   Float_t dxy;
   Float_t dz;
   Float_t chi2LocalPosition;
   Float_t kickFinder;
-  Float_t fracValidTrackhit;
+  Float_t innerfracValidTrackhit;
 
   Int_t matchedStations;
-  Int_t pixelHits;
-  Int_t layerHits;
-  Int_t pixelLayers;
+  Int_t innerpixelHits;
+  Int_t innerlayerHits;
+  Int_t innerpixelLayers;
   Int_t isPFMuon;
 
 
@@ -187,6 +220,15 @@ public:
   std::vector <HLTMuonCand>     hltIOmuons;
   std::vector <HLTMuonCand>     L2muons;      
   std::vector <L1MuonCand>      L1muons;      
+
+//*******************INCLUDED*******************//
+  std::vector <HltTrackCand>    hltTrackOI;
+  std::vector <HltTrackCand>    hltTrackIOL1;
+  std::vector <HltTrackCand>    hltTrackIOL2;
+//**********************************************//
+
+
+
   HLTInfo                       hlt;           
   HLTInfo                       hltTag;            
 

@@ -49,6 +49,15 @@ enum HLTCollectionType {
   iL3IOmuons,
 };
 
+
+//*********INCLUDED*********// 
+enum TrackCollectionType {
+  ihltTrackOI=0,
+  ihltTrackIOL1,
+  ihltTrackIOL2,
+};
+//**************************//
+
 class MuonNtuples : public edm::EDAnalyzer {
 
  public:
@@ -74,7 +83,15 @@ class MuonNtuples : public edm::EDAnalyzer {
   void fillMuons(const edm::Handle<reco::MuonCollection> &,
                  const reco::Vertex &, 
                  const edm::Event   & 
-                );
+		 );
+  //*****************************INCLUDED*****************************//
+  void fillHltTrack(const edm::Handle<reco::TrackCollection>  &,
+		    const reco::Vertex  &,
+		    const edm::Event    &,
+                    TrackCollectionType type
+		    );
+  //******************************************************************//
+
 
   void fillHltMuons(const edm::Handle<reco::RecoChargedCandidateCollection> &,
                     const edm::Event   &,
@@ -96,6 +113,16 @@ class MuonNtuples : public edm::EDAnalyzer {
   edm::EDGetTokenT<std::vector<reco::Muon>> offlineMuonToken_;
   /// file service
   edm::Service<TFileService> outfile_;
+
+//*****************************INCLUDED*****************************//
+  edm::InputTag theTrackOITag_;
+  edm::EDGetTokenT<reco::TrackCollection> theTrackOIToken_;
+  edm::InputTag theTrackIOL2Tag_;
+  edm::EDGetTokenT<reco::TrackCollection> theTrackIOL2Token_;
+  edm::InputTag theTrackIOL1Tag_;
+  edm::EDGetTokenT<reco::TrackCollection> theTrackIOL1Token_;
+//******************************************************************//
+
 
   // Trigger process
   edm::InputTag triggerResultTag_;
@@ -142,6 +169,16 @@ MuonNtuples::MuonNtuples(const edm::ParameterSet& cfg):
     offlinePVToken_         (consumes<reco::VertexCollection>(offlinePVTag_)), 
   offlineMuonTag_         (cfg.getParameter<edm::InputTag>("offlineMuons")), 
     offlineMuonToken_       (consumes<std::vector<reco::Muon>>(offlineMuonTag_)), 
+
+//********************************************INCLUDED********************************************//
+  theTrackOITag_          (cfg.getUntrackedParameter<edm::InputTag>("theTrackOI")),
+    theTrackOIToken_        (consumes<reco::TrackCollection>(theTrackOITag_)),
+  theTrackIOL2Tag_          (cfg.getUntrackedParameter<edm::InputTag>("theTrackIOL2")),
+    theTrackIOL2Token_        (consumes<reco::TrackCollection>(theTrackIOL2Tag_)),
+  theTrackIOL1Tag_          (cfg.getUntrackedParameter<edm::InputTag>("theTrackIOL1")),
+    theTrackIOL1Token_        (consumes<reco::TrackCollection>(theTrackIOL1Tag_)),
+//************************************************************************************************//
+
 
   triggerResultTag_       (cfg.getUntrackedParameter<edm::InputTag>("triggerResult")), 
     triggerResultToken_     (consumes<edm::TriggerResults>(triggerResultTag_)),
@@ -215,6 +252,24 @@ void MuonNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
     event.getByToken(offlineMuonToken_, muons);
     fillMuons(muons, pv, event);
 
+//******************************************INCLUDED******************************************//
+    //Track Outside-In
+    edm::Handle<reco::TrackCollection> trackOI;
+    event.getByToken(theTrackOIToken_, trackOI);
+    fillHltTrack(trackOI, pv, event, TrackCollectionType::ihltTrackOI);
+
+    //Track Inside Out from L2
+    edm::Handle<reco::TrackCollection> trackIOL2;
+    event.getByToken(theTrackIOL2Token_, trackIOL2);
+    fillHltTrack(trackIOL2, pv, event, TrackCollectionType::ihltTrackIOL2);
+
+    //Track Outside In from L1
+    edm::Handle<reco::TrackCollection> trackIOL1;
+    event.getByToken(theTrackIOL1Token_, trackIOL1);
+    fillHltTrack(trackIOL1, pv, event, TrackCollectionType::ihltTrackIOL1);
+
+//********************************************************************************************//
+
   // Fill bx and inst lumi info
     if (event.isRealData()) {
       event_.bxId  = event.bunchCrossing();
@@ -279,8 +334,6 @@ void MuonNtuples::analyze (const edm::Event &event, const edm::EventSetup &event
   }
   else 
     edm::LogError("") << "Trigger collection for tag muon not found !!!";
-
-
 
  // Handle the online muon collection and fill online muons //the hltmuons branch
   edm::Handle<reco::RecoChargedCandidateCollection> l3cands;
@@ -433,6 +486,42 @@ void MuonNtuples::fillHlt(const edm::Handle<edm::TriggerResults>   & triggerResu
 }
 
 
+// ---------------------------------------------------------------------
+//**********************************************INCLUDED*********************************************//
+//Incluir hltTrack copiar collection dentro de muons en innertrack
+
+void MuonNtuples::fillHltTrack(const edm::Handle<reco::TrackCollection>  & trackm ,
+			       const reco::Vertex                        & tv     ,
+			       const edm::Event                          & tevent ,
+			       TrackCollectionType type)
+{
+  int t_mu=0;
+  for(reco::TrackCollection::const_iterator t=trackm->begin(); t!=trackm->end(); t++){
+
+    t_mu++;
+    HltTrackCand MuTrack;
+
+    MuTrack.pt   = t -> pt() ;
+    MuTrack.eta  = t -> eta();
+    MuTrack.phi  = t -> phi();
+
+    MuTrack.chi2           = t  ->  normalizedChi2();
+    MuTrack.dxy            = t  ->  dxy();
+    MuTrack.dz             = t  ->  dz() ;
+    MuTrack.pixelHits      = t  ->  hitPattern().numberOfValidPixelHits();
+    MuTrack.validHits      = t  ->  numberOfValidHits();
+
+    MuTrack.layerHits         = t -> hitPattern().trackerLayersWithMeasurement(); 
+    MuTrack.pixelLayers       = t -> hitPattern().pixelLayersWithMeasurement(); 
+    MuTrack.fracValidTrackhit = t -> validFraction();  
+  
+    if (type == TrackCollectionType::ihltTrackOI)   {event_.hltTrackOI.push_back(MuTrack)  ;  continue; }
+    if (type == TrackCollectionType::ihltTrackIOL1) {event_.hltTrackIOL1.push_back(MuTrack);  continue; }
+    if (type == TrackCollectionType::ihltTrackIOL2) {event_.hltTrackIOL2.push_back(MuTrack);  continue; }
+
+  }
+}
+//****************************************************************************************************//
 
 // ---------------------------------------------------------------------
 void MuonNtuples::fillMuons(const edm::Handle<reco::MuonCollection>       & muons ,
@@ -461,18 +550,26 @@ void MuonNtuples::fillMuons(const edm::Handle<reco::MuonCollection>       & muon
     muon::isMediumMuon( (*mu1)     ) ? theMu.isMedium = 1 : theMu.isMedium = 0;
 
 
-//**************************************INCLUDED**************************************//  
+    //New variables in the Ntuple 
 
     if (mu1 -> globalTrack().isNonnull()){
-      theMu.normalizedChi2 = mu1 -> globalTrack() -> normalizedChi2(); //normalized global-track chi2
+      theMu.chi2 = mu1 -> globalTrack() -> normalizedChi2(); //normalized global-track chi2
       theMu.validHits      = mu1 -> globalTrack() -> hitPattern().numberOfValidHits(); //number of muon-chamber  hit included in the global muon track
     } 
 
+
     if (mu1 -> innerTrack().isNonnull()){
-      theMu.pixelHits         = mu1 -> innerTrack() -> hitPattern().numberOfValidPixelHits()      ; //number of pixel hits
-      theMu.layerHits         = mu1 -> innerTrack() -> hitPattern().trackerLayersWithMeasurement(); //hits per layer
-      theMu.pixelLayers       = mu1 -> innerTrack() -> hitPattern().pixelLayersWithMeasurement()  ; //number of pixel layers
-      theMu.fracValidTrackhit = mu1 -> innerTrack() -> validFraction();  //fraction of valid tracker hits 
+      theMu.innerpt           = mu1 -> innerTrack() -> pt();
+      theMu.innereta          = mu1 -> innerTrack() -> eta();
+      theMu.innerphi          = mu1 -> innerTrack() -> phi();
+      theMu.innervalidHits    = mu1 -> innerTrack() -> numberOfValidHits();
+      theMu.innerchi2         = mu1 -> innerTrack() -> normalizedChi2();
+      theMu.innerdxy          = mu1 -> innerTrack() -> dxy();
+      theMu.innerdz           = mu1 -> innerTrack() -> dz();
+      theMu.innerpixelHits    = mu1 -> innerTrack() -> hitPattern().numberOfValidPixelHits()      ; //number of pixel hits
+      theMu.innerlayerHits    = mu1 -> innerTrack() -> hitPattern().trackerLayersWithMeasurement(); //hits per layer
+      theMu.innerpixelLayers  = mu1 -> innerTrack() -> hitPattern().pixelLayersWithMeasurement()  ; //number of pixel layers
+      theMu.innerfracValidTrackhit = mu1 -> innerTrack() -> validFraction();  //fraction of valid tracker hits 
     }
 
     theMu.dxy               = mu1 -> muonBestTrack() -> dxy();//transverse distance of the tracker track wrt primary vertex
@@ -480,8 +577,6 @@ void MuonNtuples::fillMuons(const edm::Handle<reco::MuonCollection>       & muon
     theMu.chi2LocalPosition = mu1 -> combinedQuality().chi2LocalPosition; //tracker standalone position match
     theMu.kickFinder        = mu1 -> combinedQuality().trkKink; //kick finder
     theMu.matchedStations   = mu1 -> numberOfMatchedStations(); //number of muons stations with segment
-
-
 
 
     theMu.chargedDep_dR03 = mu1->pfIsolationR03().sumChargedHadronPt ;
@@ -568,6 +663,12 @@ void MuonNtuples::beginEvent()
 
 
   event_.genParticles.clear();
+
+//*******************INCLUDED*******************//
+  event_.hltTrackOI.clear();
+  event_.hltTrackIOL1.clear();
+  event_.hltTrackIOL2.clear();
+//**********************************************//
   event_.muons.clear();
   event_.hltmuons.clear();
   event_.L2muons.clear();
