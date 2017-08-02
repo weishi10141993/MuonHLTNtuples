@@ -1,4 +1,5 @@
 
+
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TFile.h"
@@ -48,12 +49,12 @@ float offlinePtCut         = 30.; //Change depending on path (+2GeV)
 //                                          *
 // ******************************************
 
-void readNtuples(TString inputfilename="/afs/cern.ch/user/s/sferrere/private/CMSSW_9_2_3_patch1/src/workspace/muonNtuples.root", std::string effmeasured="L3"){
+void readNtuples(TString inputfilename="/afs/cern.ch/user/s/sferrere/private/CMSSW_9_2_7/src/workspace/old_reco/results/result_old_reco.root", std::string effmeasured="L3"){
 
   //Because we dont want the passfilter to be a L1
   bool doingL1 = thepassfilter.find("L1fL1") != std::string::npos; 
 
-  TFile* outfile = TFile::Open(Form("%s_efficiencyTnP.root", effmeasured.c_str()),"RECREATE");
+  TFile* outfile = TFile::Open(Form("%s_efficiency_old_reco.root", effmeasured.c_str()),"RECREATE");
   std::cout << "output file: " << outfile -> GetName() << std::endl;
 
   //Create histograms  
@@ -238,12 +239,12 @@ void readNtuples(TString inputfilename="/afs/cern.ch/user/s/sferrere/private/CMS
 	muonPhi      -> Fill( pass, ev -> muons.at(jmu).phi);
 	muonEff      -> Fill( pass, 0.5                    );
 
-	muonchi2   -> Fill( pass, ev -> muons.at(jmu).normalizedChi2 );
+	muonchi2   -> Fill( pass, ev -> muons.at(jmu).innerchi2 );
         muondxy    -> Fill( pass, ev -> muons.at(jmu).dxy);
         muondz     -> Fill( pass, ev -> muons.at(jmu).dz);
-        muonPixHit -> Fill( pass, ev -> muons.at(jmu).pixelHits);
-        muonLayHit -> Fill( pass, ev -> muons.at(jmu).layerHits);
-        muonPixLay -> Fill( pass, ev -> muons.at(jmu).pixelLayers);
+        muonPixHit -> Fill( pass, ev -> muons.at(jmu).innerpixelHits);
+        muonLayHit -> Fill( pass, ev -> muons.at(jmu).innerlayerHits);
+        muonPixLay -> Fill( pass, ev -> muons.at(jmu).innerpixelLayers);
 
 
 	muonOver16Pt  -> Fill( pass && matchWith2016, ev -> muons.at(jmu).pt );
@@ -263,35 +264,35 @@ void readNtuples(TString inputfilename="/afs/cern.ch/user/s/sferrere/private/CMS
 	if (fabs(ev -> muons.at(jmu).eta) < 0.9){
 	  muonPt_barrel     -> Fill( pass, ev -> muons.at(jmu).pt );
 	  nvtx_barrel       -> Fill( pass, ev -> nVtx );
-	  muonchi2_barrel   -> Fill( pass, ev -> muons.at(jmu).normalizedChi2 );
+	  muonchi2_barrel   -> Fill( pass, ev -> muons.at(jmu).innerchi2 );
 	  muondxy_barrel    -> Fill( pass, ev -> muons.at(jmu).dxy);
 	  muondz_barrel     -> Fill( pass, ev -> muons.at(jmu).dz);
-	  muonPixHit_barrel -> Fill( pass, ev -> muons.at(jmu).pixelHits);
-	  muonLayHit_barrel -> Fill( pass, ev -> muons.at(jmu).layerHits);
-	  muonPixLay_barrel -> Fill( pass, ev -> muons.at(jmu).pixelLayers);
+	  muonPixHit_barrel -> Fill( pass, ev -> muons.at(jmu).innerpixelHits);
+	  muonLayHit_barrel -> Fill( pass, ev -> muons.at(jmu).innerlayerHits);
+	  muonPixLay_barrel -> Fill( pass, ev -> muons.at(jmu).innerpixelLayers);
 	}
 
 	//INCLUDED INTERMEDIATE REGION//
 	if (fabs(ev -> muons.at(jmu).eta)>0.9 && fabs(ev -> muons.at(jmu).eta)<1.6){
 	  muonPt_int     -> Fill( pass, ev -> muons.at(jmu).pt);
 	  nvtx_int       -> Fill( pass, ev -> nVtx );
-	  muonchi2_int   -> Fill( pass, ev -> muons.at(jmu).normalizedChi2 );
+	  muonchi2_int   -> Fill( pass, ev -> muons.at(jmu).innerchi2 );
 	  muondxy_int    -> Fill( pass, ev -> muons.at(jmu).dxy);
 	  muondz_int     -> Fill( pass, ev -> muons.at(jmu).dz);
-	  muonPixHit_int -> Fill( pass, ev -> muons.at(jmu).pixelHits);
-	  muonLayHit_int -> Fill( pass, ev -> muons.at(jmu).layerHits);
-	  muonPixLay_int -> Fill( pass, ev -> muons.at(jmu).pixelLayers);
+	  muonPixHit_int -> Fill( pass, ev -> muons.at(jmu).innerpixelHits);
+	  muonLayHit_int -> Fill( pass, ev -> muons.at(jmu).innerlayerHits);
+	  muonPixLay_int -> Fill( pass, ev -> muons.at(jmu).innerpixelLayers);
 	}
 	//INCLUDED ENDCAP//
 	else {
 	  muonPt_endcap     -> Fill( pass, ev -> muons.at(jmu).pt );
 	  nvtx_endcap       -> Fill( pass, ev -> nVtx             );
-	  muonchi2_endcap   -> Fill( pass, ev -> muons.at(jmu).normalizedChi2 );
+	  muonchi2_endcap   -> Fill( pass, ev -> muons.at(jmu).innerchi2 );
 	  muondxy_endcap    -> Fill( pass, ev -> muons.at(jmu).dxy);
 	  muondz_endcap     -> Fill( pass, ev -> muons.at(jmu).dz);
-	  muonPixHit_endcap -> Fill( pass, ev -> muons.at(jmu).pixelHits);
-	  muonLayHit_endcap -> Fill( pass, ev -> muons.at(jmu).layerHits);
-	  muonPixLay_endcap -> Fill( pass, ev -> muons.at(jmu).pixelLayers);
+	  muonPixHit_endcap -> Fill( pass, ev -> muons.at(jmu).innerpixelHits);
+	  muonLayHit_endcap -> Fill( pass, ev -> muons.at(jmu).innerlayerHits);
+	  muonPixLay_endcap -> Fill( pass, ev -> muons.at(jmu).innerpixelLayers);
 	}
 
 
