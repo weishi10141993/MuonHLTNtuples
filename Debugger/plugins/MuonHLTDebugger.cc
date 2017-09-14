@@ -184,38 +184,28 @@ private:
   edm::Service<TFileService> outfile_;
   std::map<std::string, TH1*> hists_;     
 
-  edm::EDGetTokenT<reco::TrackCollection>           theIOTracksToken_;
-  edm::EDGetTokenT<reco::TrackCollection>           theIOFromL1TracksToken_;
-  edm::EDGetTokenT<reco::TrackCollection>           theOITracksToken_;
-
-//  edm::EDGetTokenT<reco::TrackCollection>     thePixelTracksIter0Token_;
-//  edm::EDGetTokenT<TrajectorySeedCollection>  theSeedsIter0Token_;
-//  edm::EDGetTokenT<TrajectorySeedCollection>  theSeedsIter2Token_;
-//  edm::EDGetTokenT<TrackCandidateCollection>  theTracksCandIter0Token_;
-//  edm::EDGetTokenT<TrackCandidateCollection>  theTracksCandIter2Token_;
-//  edm::EDGetTokenT<TrackCandidateCollection>  theTracksCandOIToken_;
-//  edm::EDGetTokenT<TrackCandidateCollection>  theTracksCandOISToken_;
-//  edm::EDGetTokenT<TrackCandidateCollection>  theTracksCandOIHToken_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksNoHPIter0Token_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksNoHPIter2Token_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksIter0Token_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksIter2Token_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksToken_;
+  //  edm::EDGetTokenT<reco::TrackCollection>           theIOTracksToken_;
+  //  edm::EDGetTokenT<reco::TrackCollection>           theIOFromL1TracksToken_;
+  //  edm::EDGetTokenT<reco::TrackCollection>           theOITracksToken_;
+  edm::InputTag  theTracksOICandTag_;
+  edm::EDGetTokenT<TrackCandidateCollection>    theTracksOICandToken_;
+  edm::InputTag  theTracksOINoHPTag_;
+  edm::EDGetTokenT<reco::TrackCollection>           theTracksOINoHPToken_;
   edm::InputTag  theTracksOITag_;
   edm::EDGetTokenT<reco::TrackCollection>           theTracksOIToken_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksOISToken_;
-//  edm::EDGetTokenT<reco::TrackCollection>           theTracksOIHToken_;
-//  edm::EDGetTokenT<reco::MuonTrackLinksCollection>  theIOLinksToken_;
-//  edm::EDGetTokenT<reco::MuonTrackLinksCollection>  theOILinksToken_;
+
   edm::EDGetTokenT<reco::MuonTrackLinksCollection>  theLinksToken_;
   edm::EDGetTokenT<reco::TrackExtraCollection>  theMuonsWithHitsToken_;
   edm::EDGetTokenT<std::vector< PileupSummaryInfo > >  puSummaryInfo_;
   edm::EDGetTokenT<reco::BeamSpot>                     theBeamSpotToken_;
   edm::EDGetTokenT<reco::VertexCollection>  theVertexToken_;
-  edm::EDGetTokenT<TrajectorySeedCollection> theSeedsOIToken_;
+  
+  // SEEDS... 
+  edm::InputTag  theSeedsOITag_;
+  edm::EDGetTokenT<TrajectorySeedCollection> theSeedsOIToken_;  
   edm::EDGetTokenT<L3MuonTrajectorySeedCollection> theSeedsOISToken_;
   edm::EDGetTokenT<L3MuonTrajectorySeedCollection> theSeedsOIHToken_;
-
+  
   edm::ESHandle<MagneticField> magneticField_;
   edm::ESHandle<Propagator> propagator_;
   edm::ESHandle<TransientTrackBuilder> theB;
@@ -271,9 +261,7 @@ MuonHLTDebugger::MuonHLTDebugger(const edm::ParameterSet& cfg):
   isMC_                   (cfg.getUntrackedParameter<bool>("isMC")),
   runSharedHits_          (cfg.getUntrackedParameter<bool>("runSharedHits")),
   UseGenInfo_             (cfg.getUntrackedParameter<bool>("UseGenInfo")),
-//  theIOTracksToken_       (consumes<reco::TrackCollection>(edm::InputTag("hltIter2IterL3MuonMerged","","TEST"))),
-//  theIOFromL1TracksToken_ (consumes<reco::TrackCollection>(edm::InputTag("hltIter2IterL3FromL1MuonMerged","","TEST"))),
-//  theOITracksToken_       (consumes<reco::TrackCollection>(edm::InputTag("hltIterL3OIMuCtfWithMaterialTracks","","TEST"))),
+  //  theOITracksToken_       (consumes<reco::TrackCollection>(edm::InputTag("hltIterL3OIMuCtfWithMaterialTracks","","TEST"))),
   //  thePixelTracksIter0Token_ (mayConsume<reco::TrackCollection>(edm::InputTag("hltIter0IterL3MuonPixelSeedsFromPixelTracks","","TEST"))),
   //  theSeedsIter0Token_     (mayConsume<TrajectorySeedCollection>(edm::InputTag("hltIter0IterL3MuonPixelSeedsFromPixelTracks","","TEST"))),
   //  theSeedsIter2Token_     (mayConsume<TrajectorySeedCollection>(edm::InputTag("hltIter2IterL3MuonPixelSeeds","","TEST"))),
@@ -286,19 +274,21 @@ MuonHLTDebugger::MuonHLTDebugger(const edm::ParameterSet& cfg):
   //  theTracksNoHPIter2Token_(mayConsume<reco::TrackCollection>(edm::InputTag("hltIter2IterL3MuonCtfWithMaterialTracks","","TEST"))),
   //  theTracksIter0Token_    (mayConsume<reco::TrackCollection>(edm::InputTag("hltIter0IterL3MuonTrackSelectionHighPurity","","TEST"))),
   //  theTracksIter2Token_    (mayConsume<reco::TrackCollection>(edm::InputTag("hltIter2IterL3MuonTrackSelectionHighPurity","","TEST"))),
+  theTracksOICandTag_     (cfg.getUntrackedParameter<edm::InputTag>("theTracksOICand")),
+  theTracksOICandToken_   (mayConsume<TrackCandidateCollection>(theTracksOICandTag_)),
+  theTracksOINoHPTag_     (cfg.getUntrackedParameter<edm::InputTag>("theTracksOINoHP")),
+  theTracksOINoHPToken_   (mayConsume<reco::TrackCollection>(theTracksOINoHPTag_)),
   theTracksOITag_         (cfg.getUntrackedParameter<edm::InputTag>("theTracksOI")),
   theTracksOIToken_       (mayConsume<reco::TrackCollection>(theTracksOITag_)),
-  //  theTracksOINoHPToken_   (mayConsume<reco::TrackCollection>(edm::InputTag("hltIterL3OIMuCtfWithMaterialTracks","","TEST"))),
-  //  theTracksOISHToken_     (mayConsume<reco::TrackCollection>(edm::InputTag("hltL3TkTracksMergeStep1","","TEST"))),
-  //  theTracksOIHToken_       (mayConsume<reco::TrackCollection>(edm::InputTag("hltL3TkTracksFromL2OIHit","","TEST"))),
-  //  theIOLinksToken_        (mayConsume<reco::MuonTrackLinksCollection>(edm::InputTag("hltL3MuonsIterL3IO","","TEST"))),
-  //  theOILinksToken_        (mayConsume<reco::MuonTrackLinksCollection>(edm::InputTag("hltL3MuonsIterL3OI","","TEST"))),
+  
   theLinksToken_          (consumes<reco::MuonTrackLinksCollection>(cfg.getUntrackedParameter<edm::InputTag>("MuonLinksTag"))),
   theMuonsWithHitsToken_  (consumes<reco::TrackExtraCollection>(edm::InputTag("globalMuons"))),
   puSummaryInfo_          (consumes<std::vector< PileupSummaryInfo > >(edm::InputTag("addPileupInfo"))),
   theBeamSpotToken_       (consumes<reco::BeamSpot>(edm::InputTag("hltOnlineBeamSpot"))),
   theVertexToken_         (consumes<reco::VertexCollection>(edm::InputTag("offlinePrimaryVertices"))),
-  theSeedsOIToken_        (mayConsume<TrajectorySeedCollection>(edm::InputTag("hltIterL3OISeedsFromL2Muons","","TEST"))),
+
+  theSeedsOITag_          (cfg.getUntrackedParameter<edm::InputTag>("theTracksOISeeds")),
+  theSeedsOIToken_        (mayConsume<TrajectorySeedCollection>(theSeedsOITag_)),
   theSeedsOISToken_       (mayConsume<L3MuonTrajectorySeedCollection>(edm::InputTag("hltL3TrajSeedOIState","","TEST"))),
   theSeedsOIHToken_       (mayConsume<L3MuonTrajectorySeedCollection>(edm::InputTag("hltL3TrajSeedOIHit","","TEST")))
   //  targetMuonSelector_     ("isGlobalMuon && abs(eta) < 2.4 && pt > 10")
@@ -336,8 +326,11 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if (isMC_) {
     iEvent.getByToken(genToken_, genParticles);
   }
-  
 
+  if (debuglevel_ > 1)
+    cout << "#####################################################################################" << endl;
+    cout << "[EVENT] Run:Event --> " << iEvent.id().run() << " : " << iEvent.id().event() << endl;
+  
   //########################### Trigger Info ###########################
   // Get objects from the event.  
   Handle<trigger::TriggerEvent> triggerSummary;
@@ -542,7 +535,7 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   
   vector<size_t> matchesL1 = matchByDeltaR(targetMuons,L1MuonTrigObjects,0.4); 
   vector<size_t> matchesL2 = matchByDeltaR(targetMuons,L2MuonTrigObjects,0.3); 
-  vector<size_t> matchesL3 = matchByDeltaR(targetMuons,L3MuonTrigObjects,0.1); 
+  vector<size_t> matchesL3 = matchByDeltaR(targetMuons,L3MuonTrigObjects,0.2); 
   
   int NumL2Matched(0), NumL3Matched(0);
   if (runSharedHits_) {
@@ -613,15 +606,15 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if (L2MuonTrigObjects.size()>0) hists_["hlt_FracL2Match" ]->Fill((float)NumL2Matched/(float)L2MuonTrigObjects.size());
   if (L3MuonTrigObjects.size()>0) hists_["hlt_FracL3Match" ]->Fill((float)NumL3Matched/(float)L3MuonTrigObjects.size());
 
-  if (debuglevel_ > 1)
-    cout << "[Checking EVENT] Run:Event --> " << iEvent.id().run() << " : " << iEvent.id().event() << endl;
-  
   if (debuglevel_ > 1) {
     std::cout << "Number of L1s passing filter = " << L1MuonTrigObjects.size() << " ( " << matchesL1.size() << " ) " << std::endl;
     std::cout << "Number of L2s passing filter = " << L2MuonTrigObjects.size() << " ( " << NumL2Matched << " ) " << std::endl;
     std::cout << "Number of L3s passing filter = " << L3MuonTrigObjects.size() << " ( " << NumL3Matched << " ) " << std::endl;
   }
   
+  if (debuglevel_ > 1) {
+    if (L2MuonTrigObjects.size() > 0 && L3MuonTrigObjects.size()!=L2MuonTrigObjects.size())   cout << "[FAILING EVENT - IO] Run:Event --> " << iEvent.id().run() << " : " << iEvent.id().event() << endl;
+  }
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////
   ////////          EVENT DEBUGGING     
@@ -890,14 +883,23 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  hists_["hlt_OI_seedPhiErr_endcap"]->Fill(sqrt(seedTSOS.curvilinearError().matrix()(2,2)));
 	  hists_["hlt_OI_seedEtaErr_endcap"]->Fill(sqrt(seedTSOS.curvilinearError().matrix()(1,1))*abs(sin(seedTSOS.globalMomentum().theta())));
 	}	    
-      }
-    }
-  }
-  catch (...) {
-  }
+	if (debuglevel_ > 1) { 
+	  cout << " TSOS of OIState     = \n"
+	       <<"x: "<<seedTSOS.globalPosition()<< " --> " << seedTSOS.localPosition() << "\n" 
+	       <<"p: "<<seedTSOS.globalMomentum()<< "\n"
+	       <<"pt: " << seedTSOS.globalMomentum().perp() << " +/- " << sqrt(partialPterror)/seedTSOS.globalMomentum().perp() << "\n"
+	       <<"eta: " << seedTSOS.globalMomentum().eta() << " +/- " << sqrt(seedTSOS.curvilinearError().matrix()(1,1))*abs(sin(seedTSOS.globalMomentum().theta())) << "\n"
+	       <<"phi: " << seedTSOS.globalMomentum().phi() << " +/- " << sqrt(seedTSOS.curvilinearError().matrix()(2,2)) << "\n"
+	       << id.subdetId() << " " << id.rawId() << endl;
+	  
+	  TrajectorySeed::range seedHits = seed->recHits();
+	  for ( TrajectorySeed::const_iterator iseed=seedHits.first; iseed!=seedHits.second; ++iseed){
+	    cout << " hits of hltL3TrajSeedOI -->  x: " << (*iseed).globalPosition() << " - " << (*iseed).localPosition() << "\n"
+		 << (*iseed).geographicalId().subdetId() << " " << (*iseed).geographicalId().rawId() << endl;
+	  }
 
-      /*
-	
+	}
+      }
       for (L3MuonTrajectorySeedCollection::const_iterator seed=hltL3TrajSeedOIH->begin(); seed!=hltL3TrajSeedOIH->end();seed++){
 	PTrajectoryStateOnDet ptod = seed->startingState();
 	DetId id(ptod.detId());
@@ -956,6 +958,22 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  hists_["hlt_OI_hitx"]->Fill((*iseed).globalPosition().x());
 	  hists_["hlt_OI_hity"]->Fill((*iseed).globalPosition().y());
 	  hists_["hlt_OI_hitz"]->Fill((*iseed).globalPosition().z());
+	}
+
+	if (debuglevel_ > 1) { 
+	  cout << " TSOS of OIHit     = \n"
+	       <<"x: "<<seedTSOS.globalPosition()<< " --> " << seedTSOS.localPosition() << "\n" 
+	       <<"p: "<<seedTSOS.globalMomentum()<< "\n"
+	       <<"pt: " << seedTSOS.globalMomentum().perp() << " +/- " << sqrt(partialPterror)/seedTSOS.globalMomentum().perp() << "\n"
+	       <<"eta: " << seedTSOS.globalMomentum().eta() << " +/- " << sqrt(seedTSOS.curvilinearError().matrix()(1,1))*abs(sin(seedTSOS.globalMomentum().theta())) << "\n"
+	       <<"phi: " << seedTSOS.globalMomentum().phi() << " +/- " << sqrt(seedTSOS.curvilinearError().matrix()(2,2)) << "\n"
+	       << id.subdetId() << " " << id.rawId() << endl;
+	  
+	  TrajectorySeed::range seedHits = seed->recHits();
+	  for ( TrajectorySeed::const_iterator iseed=seedHits.first; iseed!=seedHits.second; ++iseed){
+	    cout << " hits of hltL3TrajSeedOI -->  x: " << (*iseed).globalPosition() << " - " << (*iseed).localPosition() << "\n"
+		 << (*iseed).geographicalId().subdetId() << " " << (*iseed).geographicalId().rawId() << endl;
+	  }
 	}
       }
     }
@@ -1083,6 +1101,21 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  hists_["hlt_OI_hity"]->Fill((*iseed).globalPosition().y());
 	  hists_["hlt_OI_hitz"]->Fill((*iseed).globalPosition().z());
 	}
+      
+	if (debuglevel_ >1) {
+	  cout << " TSOS of hltL3TrajSeedOI     = \n"
+	       <<"x: "<<seedTSOS.globalPosition()<< " --> " << seedTSOS.localPosition() << "\n" 
+	       <<"p: "<<seedTSOS.globalMomentum()<< "\n"
+	       <<"pt: " << seedTSOS.globalMomentum().perp() << " +/- " << sqrt(partialPterror)/seedTSOS.globalMomentum().perp()  << "\n"
+	       <<"eta: " << seedTSOS.globalMomentum().eta() << " +/- " << sqrt(seedTSOS.curvilinearError().matrix()(1,1))*abs(sin(seedTSOS.globalMomentum().theta()))  << "\n"
+	       <<"phi: " << seedTSOS.globalMomentum().phi() << " +/- " << sqrt(seedTSOS.curvilinearError().matrix()(2,2)) << "\n"
+	       << id.subdetId() << " " << id.rawId() << endl;
+	  
+	  for ( TrajectorySeed::const_iterator iseed=seedHits.first; iseed!=seedHits.second; ++iseed){
+	    cout << " hits of hltL3TrajSeedOI -->  x: " << (*iseed).globalPosition() << " - " << (*iseed).localPosition() << "\n"
+		 << (*iseed).geographicalId().subdetId() << " " << (*iseed).geographicalId().rawId() << endl;
+	  }
+	}
       }
     }
   }
@@ -1092,8 +1125,53 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   /// NOW for TRACKS
   try {
     if (l2Muons->size()>0) { 
+      edm::Handle<TrackCandidateCollection> hltL3TkTracksCandOI;
+      iEvent.getByToken(theTracksOICandToken_, hltL3TkTracksCandOI);
+      if (debuglevel_ > 1) {
+	cout << "---------------------------------------------" << endl;
+	cout << "# of hltL3TkTracksCandOI  = " << hltL3TkTracksCandOI->size() << endl;
+	for( TrackCandidateCollection::const_iterator cand = hltL3TkTracksCandOI->begin(); cand != hltL3TkTracksCandOI->end(); ++cand) {
+	  auto const & candSS = cand->trajectoryStateOnDet();
+	  DetId id(candSS.detId());
+	  const GeomDet * g = theService->trackingGeometry()->idToDet( id );
+	  const Surface * surface=&g->surface();
+	  TrajectoryStateOnSurface candTSOS = trajectoryStateTransform::transientState(candSS, surface,  &*(theService)->magneticField());
+	  
+	  /// TSOS errors: 
+	  AlgebraicSymMatrix66 errors = candTSOS.cartesianError().matrix();
+	  double partialPterror = errors(3,3)*pow(candTSOS.globalMomentum().x(),2) + errors(4,4)*pow(candTSOS.globalMomentum().y(),2);
+	  double numberOfHits = cand->recHits().second-cand->recHits().first;
+	  unsigned int stopReason = static_cast<unsigned int>(cand->stopReason());
+	  if (debuglevel_ >1) {
+	    cout << " TSOS of hltL3TkTracksCandOI     = \n"
+		 <<"x: "<<candTSOS.globalPosition()<< " --> " << candTSOS.localPosition() << "\n" 
+		 <<"p: "<<candTSOS.globalMomentum()<< "\n"
+		 <<"pt: " << candTSOS.globalMomentum().perp() << " +/- " << sqrt(partialPterror)/candTSOS.globalMomentum().perp()  << "\n"
+		 <<"eta: " << candTSOS.globalMomentum().eta() << " +/- " << sqrt(candTSOS.curvilinearError().matrix()(1,1))*abs(sin(candTSOS.globalMomentum().theta()))  << "\n"
+		 <<"phi: " << candTSOS.globalMomentum().phi() << " +/- " << sqrt(candTSOS.curvilinearError().matrix()(2,2)) << "\n"
+		 << id.subdetId() << " " << id.rawId() << "\n"
+	         <<"nhits: " << numberOfHits << "; stop reason: " << stopReason << endl;
+	    
+	  }
+	}
+      }
+      edm::Handle<reco::TrackCollection> hltL3TkTracksOINoHP;
+      iEvent.getByToken(theTracksOINoHPToken_, hltL3TkTracksOINoHP);
+      if (debuglevel_ > 1) {
+	cout << "# of hltL3TkTracksOINoHP  = " << hltL3TkTracksOINoHP->size() << endl;
+	for (reco::TrackCollection::const_iterator t=hltL3TkTracksOINoHP->begin(); t!=hltL3TkTracksOINoHP->end(); t++) {
+	  cout << "     hltL3TkTracksOINoHP -->  pt: " << t->pt() << " eta: " << t->eta() << " phi: " << t->phi() << " ; chi2: "
+	       << t->normalizedChi2() <<" PixHits: "<< t->hitPattern().numberOfValidPixelHits() << " Hits: "<< t->numberOfValidHits() << " TrkLay: " 
+	       << t->hitPattern().trackerLayersWithMeasurement() << " dz: " << t->dz(beamSpot.position()) << " dxy: " << t->dxy(beamSpot.position())  
+	       <<  endl;
+	}
+      }
+      
       edm::Handle<reco::TrackCollection> hltL3TkTracksOI;
       iEvent.getByToken(theTracksOIToken_, hltL3TkTracksOI);
+      
+      if (debuglevel_ > 1) 
+	cout << "# of hltL3TkTracksOI     = " << hltL3TkTracksOI->size() << endl;    
       for (reco::TrackCollection::const_iterator t=hltL3TkTracksOI->begin(); t!=hltL3TkTracksOI->end(); t++) {
 	hists_["hlt_OI_trackPt"]       ->Fill(t->pt());
 	hists_["hlt_OI_trackEta"]      ->Fill(t->eta());
@@ -1113,6 +1191,13 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	hists_["hlt_OI_trackValidHitsVsEta"]->Fill(t->eta(),t->numberOfValidHits() );
 	hists_["hlt_OI_trackLayersVsEta"]   ->Fill(t->eta(),t->hitPattern().trackerLayersWithMeasurement() );
 	
+	if (debuglevel_ > 1){ 
+	  cout << "     hltL3TkTracksOI -->  pt: " << t->pt() << " eta: " << t->eta() << " phi: " << t->phi() << " ; chi2: "
+	       << t->normalizedChi2() <<" PixHits: "<< t->hitPattern().numberOfValidPixelHits() << " Hits: "<< t->numberOfValidHits() << " TrkLay: " 
+	       << t->hitPattern().trackerLayersWithMeasurement() << " dz: " << t->dz(beamSpot.position()) << " dxy: " << t->dxy(beamSpot.position())  
+	       <<  endl;
+	}
+
 	/// MATCH To RECO and COMPARE: 
 	vector<size_t> matchesRECO = matchByDeltaR(targetMuons,*hltL3TkTracksOI,0.1);
 	for (size_t i = 0; i < targetMuons.size(); i++) {
@@ -1126,6 +1211,13 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
  	  hists_["hlt_OI_trackResValidPixelHitsVsEta"]->Fill(trk->eta(), trk->hitPattern().numberOfValidPixelHits() - mu.innerTrack()->hitPattern().numberOfValidPixelHits());
  	  hists_["hlt_OI_trackResValidHitsVsEta"]->Fill(trk->eta(), trk->numberOfValidHits() - mu.innerTrack()->numberOfValidHits() );
  	  hists_["hlt_OI_trackResLayersVsEta"]   ->Fill(trk->eta(), trk->hitPattern().trackerLayersWithMeasurement() - mu.innerTrack()->hitPattern().trackerLayersWithMeasurement());
+
+	  if (debuglevel_ > 1){
+	    cout << " muon innertrack -->  pt: " << mu.innerTrack()->pt() << " eta: " << mu.innerTrack()->eta() << " phi: " << mu.innerTrack()->phi() 
+		 << " ; chi2: " << mu.innerTrack()->normalizedChi2() <<" PixHits: " << mu.innerTrack()->hitPattern().numberOfValidPixelHits() 
+		 << " Hits: "<< mu.innerTrack()->numberOfValidHits() << " TrkLay: " << mu.innerTrack()->hitPattern().trackerLayersWithMeasurement() 
+		 << " dz: " << mu.innerTrack()->dz(beamSpot.position()) << " dxy: " << mu.innerTrack()->dxy(beamSpot.position()) <<  endl;
+	  }
 	}
       }
     }
@@ -1187,7 +1279,7 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	    
 	    PTrajectoryStateOnDet pTSOD = seed->startingState();
 	    DetId seedDetId(pTSOD.detId());
-	    const GeomDet* gdet = theService->trackingGeometry()->idToDet( seedDetId );
+v	    const GeomDet* gdet = theService->trackingGeometry()->idToDet( seedDetId );
 	    TrajectoryStateOnSurface seedTSOS = trajectoryStateTransform::transientState(pTSOD, &(gdet->surface()), &*(theService)->magneticField());
 	    AlgebraicSymMatrix66 errors = seedTSOS.cartesianError().matrix();
 	    double partialPterror = errors(3,3)*pow(seedTSOS.globalMomentum().x(),2) + errors(4,4)*pow(seedTSOS.globalMomentum().y(),2);
@@ -1279,7 +1371,7 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  /// Store some information of such events failing the L3 reconstruction: 
 	  edm::Handle<TrajectorySeedCollection> hltL3TrajSeedOI;
 	  iEvent.getByToken(theSeedsOIToken_, hltL3TrajSeedOI);
-	
+
 	  edm::Handle<TrackCandidateCollection> hltL3TkTracksCandOI;
 	  iEvent.getByToken(theTracksCandOIToken_, hltL3TkTracksCandOI);
 	  edm::Handle<reco::TrackCollection> hltL3TkTracksOI;

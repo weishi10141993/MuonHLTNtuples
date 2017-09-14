@@ -38,13 +38,14 @@ def makePlots(inputfiles,draw,title,legends,outname):
         for k,p in enumerate(draw):
             histname = "%s" %(p)
             _hist = f.Get(histname).Clone()
+            _hist.SetDirectory(0)
             _hists.append(_hist)
             if "Eff" in p:
                 o.write('%s \t %5.4f + %5.4f - %5.4f\n' %(legends[i],_hist.GetEfficiency(1),_hist.GetEfficiencyErrorLow(1),_hist.GetEfficiencyErrorUp(1)))            
     o.close()
  
-    leg = ROOT.TLegend(0.30,0.15,0.70,0.3);
-    #leg = ROOT.TLegend(0.70,0.65,0.90,0.80);
+#    leg = ROOT.TLegend(0.30,0.15,0.70,0.3);
+    leg = ROOT.TLegend(0.55,0.65,0.90,0.80);
     leg.SetLineColor(0);
     leg.SetFillStyle(0);
     leg.SetBorderSize(0)
@@ -63,7 +64,7 @@ def makePlots(inputfiles,draw,title,legends,outname):
             if "Vs" in draw[0]:
                 hist.Draw("BOX")
             else: 
-                hist.Draw()
+                hist.Draw("HIST")
             
             if "h_" not in draw[0]:
                 ROOT.gPad.Update()
@@ -72,7 +73,7 @@ def makePlots(inputfiles,draw,title,legends,outname):
                 graph.SetMaximum(YMAX)
                 ROOT.gPad.Update()
         else:
-            hist.Draw("SAME")
+            hist.Draw("HIST SAME")
 
         leg.AddEntry(hist,legends[k],"l")
         k+=1
@@ -84,6 +85,113 @@ def makePlots(inputfiles,draw,title,legends,outname):
     c1.SaveAs(outname+".pdf");
     c1.SaveAs(outname+".png");
 
+def compareHistos(inputfiles,draw,title,legends,outname):
+    ROOT.gStyle.SetOptStat(0)
+    ROOT.gROOT.Reset()
+    #make canvas to save plots to
+    c1 = ROOT.TCanvas('c1')
+    
+    _files=[]
+    for i in inputfiles:
+        print "Opening %s..." %(i)
+        _files.append(ROOT.TFile(i))
+        
+
+    _hists=[]
+
+    if logY: outname+="_log"
+    
+    for i,f in enumerate(_files):
+        for k,p in enumerate(draw):
+            histname = "%s" %(p)
+            tmp = ROOT.TH1F()
+            tmp.SetDirectory(0)
+            tmp = f.Get(histname).Clone()
+            _hists.append(tmp)
+            
+    leg = ROOT.TLegend(0.55,0.65,0.90,0.80);#    leg = ROOT.TLegend(0.30,0.15,0.70,0.3);
+    leg.SetLineColor(0);
+    leg.SetFillStyle(0);
+    leg.SetBorderSize(0)
+    
+    k=0
+    for hist in _hists:
+        hist.Scale(1./hist.GetEntries())
+        hist.SetLineWidth(2)
+        hist.SetLineColor(k+1)
+        hist.SetTitle(title)
+        
+        if k==0 :
+            if logY: c1.SetLogy()
+            if logX: c1.SetLogx()
+            if "Vs" in draw[0]:
+                hist.Draw("BOX")
+            else: 
+                hist.Draw("HIST")            
+        else:
+            hist.Draw("HIST SAME")
+            
+        leg.AddEntry(hist,legends[k],"l")
+        k+=1
+    
+    if len(_hists)>1:
+        leg.Draw("SAME")
+    
+    c1.SaveAs(outname+".root");
+    c1.SaveAs(outname+".pdf");
+    c1.SaveAs(outname+".png");
+
+def compareHistos2D(inputfiles,draw,title,legends,outname):
+    ROOT.gStyle.SetOptStat(0)
+    ROOT.gROOT.Reset()
+    #make canvas to save plots to
+    c1 = ROOT.TCanvas('c1')
+    
+    _files=[]
+    for i in inputfiles:
+        print "Opening %s..." %(i)
+        _files.append(ROOT.TFile(i))
+        
+
+    _hists=[]
+    _hist = ROOT.TH2F()
+    _hist.SetDirectory(0)
+
+    for i,f in enumerate(_files):
+        for k,p in enumerate(draw):
+            histname = "muonDebugger/%s" %(p)
+            print histname
+            _hist = f.Get(histname).Clone()
+            _hists.append(_hist)
+            
+    leg = ROOT.TLegend(0.70,0.65,0.90,0.80);#    leg = ROOT.TLegend(0.30,0.15,0.70,0.3);
+    leg.SetLineColor(0);
+    leg.SetFillStyle(0);
+    leg.SetBorderSize(0)
+    
+    k=0
+    for hist in _hists:
+        hist.Scale(1./hist.GetEntries())
+        hist.SetLineWidth(2)
+        hist.SetLineColor(k+1)
+        hist.SetTitle(title)
+        if (YMAX!=1.02 and YMIN!=0.01): 
+            hist.GetYaxis().SetRangeUser(YMIN,YMAX)
+        
+        if k==0 :
+            hist.Draw("BOX")
+        else:
+            hist.Draw("BOX SAME")
+
+        leg.AddEntry(hist,legends[k],"l")
+        k+=1
+    
+    if len(_hists)>1:
+        leg.Draw("SAME")
+    
+    c1.SaveAs(outname+".root");
+    c1.SaveAs(outname+".pdf");
+    c1.SaveAs(outname+".png");
 
 def makePlotsFromDQM(inputfiles,draw,legends,outname):
     ROOT.gStyle.SetOptStat(0)
@@ -264,6 +372,7 @@ if __name__ == "__main__":
     parser.add_argument("-i","--inputfiles", type=str, help='The list of input files, comma separated if more than one file',required=True,nargs=1)
     parser.add_argument("--eff",type=str, help='the numerator,denominator to be used', nargs=1)
     parser.add_argument("--draw",type=str, help='the plot to be drawn',nargs=1)
+    parser.add_argument("--compare",type=str, help='the plot to be compared',nargs=1)
     parser.add_argument("--dqm",type=str, help='the plot to be drawn',nargs=1)
     parser.add_argument("--title",dest="title", type=str, help='title of the histo;xaxis;yaxis')    
     parser.add_argument("--leg", type=str,help='the list of legends to be used, comma separated',required=True,nargs=1)
@@ -300,5 +409,10 @@ if __name__ == "__main__":
         dqm = args.dqm[0].split(",")
         makePlotsFromDQM(files,dqm,legends,args.fdir+args.outname)
 
-
+    if args.compare is not None:
+        compare = args.compare[0].split(",")
+        if "Vs" in compare[0]: 
+            compareHistos2D(files,compare,args.title,legends,args.fdir+args.outname)
+        else:
+            compareHistos(files,compare,args.title,legends,args.fdir+args.outname)
 
