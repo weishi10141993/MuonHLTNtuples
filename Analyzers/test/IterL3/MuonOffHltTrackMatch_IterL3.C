@@ -52,7 +52,21 @@ void MuonOffHltTrackMatch_IterL3(TString inputfilename="/afs/cern.ch/user/s/sfer
   TH1F* PtHLT_int     = new TH1F("h_PtHLT_int"    , "PtHLT_int"   ,   80,  -0.25,    0.25 );
   TH1F* PtHLT_endcap  = new TH1F("h_PtHLT_endcap" , "PtHLT_endcap",   80,  -0.25,    0.25 );
 
-  TH1F* PtOI     = new TH1F("h_PtOI"     , "PtOI"     ,   80,  -0.25,    0.25 );
+  TH1F* QoverPtHLT         = new TH1F("h_QoverPtHLT"        , "QoverPtHLT"       ,   80,  -0.25,    0.25 );
+  TH1F* QoverPtHLT_barrel  = new TH1F("h_QoverPtHLT_barrel" , "QoverPtHLT_barrel",   80,  -0.25,    0.25 );
+  TH1F* QoverPtHLT_int     = new TH1F("h_QoverPtHLT_int"    , "QoverPtHLT_int"   ,   80,  -0.25,    0.25 );
+  TH1F* QoverPtHLT_endcap  = new TH1F("h_QoverPtHLT_endcap" , "QoverPtHLT_endcap",   80,  -0.25,    0.25 );
+
+  TH1F* PtOI          = new TH1F("h_PtOI"         , "PtOI"        ,   80,  -0.25,    0.25 );
+  TH1F* PtOI_barrel   = new TH1F("h_PtOI_barrel"  , "PtOI_barrel" ,   80,  -0.25,    0.25 );
+  TH1F* PtOI_int      = new TH1F("h_PtOI_int"     , "PtOI_int"    ,   80,  -0.25,    0.25 );
+  TH1F* PtOI_endcap   = new TH1F("h_PtOI_endcap"  , "PtOI_endcap" ,   80,  -0.25,    0.25 );
+
+  TH1F* QoverPtOI          = new TH1F("h_QoverPtOI"         , "QoverPtOI"        ,   80,  -0.25,    0.25 );
+  TH1F* QoverPtOI_barrel   = new TH1F("h_QoverPtOI_barrel"  , "QoverPtOI_barrel" ,   80,  -0.25,    0.25 );
+  TH1F* QoverPtOI_int      = new TH1F("h_QoverPtOI_int"     , "QoverPtOI_int"    ,   80,  -0.25,    0.25 );
+  TH1F* QoverPtOI_endcap   = new TH1F("h_QoverPtOI_endcap"  , "QoverPtOI_endcap" ,   80,  -0.25,    0.25 );
+
   TH1F* chi2OI   = new TH1F("h_chi2OI"   , "chi2OI"   ,  100,  -10.,   10.);
   TH1F* dxyOI    = new TH1F("h_dxyOI"    , "dxyOI"    ,  100, -0.1,   0.1 );
   TH1F* dzOI     = new TH1F("h_dzOI"     , "dzOI"     ,  100, -0.1,   0.1 );
@@ -62,7 +76,7 @@ void MuonOffHltTrackMatch_IterL3(TString inputfilename="/afs/cern.ch/user/s/sfer
 
 
   //BARREL REGION HISTOGRAMS
-  TH1F* PtOI_barrel     = new TH1F("h_PtOI_barrel"     , "PtOI_barrel"     ,   80,  -0.25,    0.25 );
+
   TH1F* chi2OI_barrel   = new TH1F("h_chi2OI_barrel"   , "chi2OI_barrel"   ,  100,  -10.,   10.);
   TH1F* dxyOI_barrel    = new TH1F("h_dxyOI_barrel"    , "dxyOI_barrel"    ,  100, -0.1,   0.1 );
   TH1F* dzOI_barrel     = new TH1F("h_dzOI_barrel"     , "dzOI_barrel"     ,  100, -0.1,   0.1 );
@@ -87,7 +101,7 @@ void MuonOffHltTrackMatch_IterL3(TString inputfilename="/afs/cern.ch/user/s/sfer
   // TH1F* PixLayIOL2_barrel = new TH1F("h_PixLayIOL2_barrel", "PixLayIOL2_barrel" ,    4,   -2,     2 );
 
   //Intermediate
-  TH1F* PtOI_int     = new TH1F("h_PtOI_int"     , "PtOI_int"     ,   80,  -0.25,    0.25 );
+
   TH1F* chi2OI_int   = new TH1F("h_chi2OI_int"   , "chi2OI_int"   ,  100,  -10.,   10.);
   TH1F* dxyOI_int    = new TH1F("h_dxyOI_int"    , "dxyOI_int"    ,  100, -0.1,   0.1 );
   TH1F* dzOI_int     = new TH1F("h_dzOI_int"     , "dzOI_int"     ,  100, -0.1,   0.1 );
@@ -113,7 +127,6 @@ void MuonOffHltTrackMatch_IterL3(TString inputfilename="/afs/cern.ch/user/s/sfer
 
 
   //endcap
-  TH1F* PtOI_endcap     = new TH1F("h_PtOI_endcap"     , "PtOI_endcap"     ,    80,    -0.25,    0.25 );
   TH1F* chi2OI_endcap   = new TH1F("h_chi2OI_endcap"   , "chi2OI_endcap"   ,   100,  -10.,   10.);
   TH1F* dxyOI_endcap    = new TH1F("h_dxyOI_endcap"    , "dxyOI_endcap"    ,   100,  -0.1,   0.1 );
   TH1F* dzOI_endcap     = new TH1F("h_dzOI_endcap"     , "dzOI_endcap"     ,   100,  -0.1,   0.1 );
@@ -184,8 +197,9 @@ void MuonOffHltTrackMatch_IterL3(TString inputfilename="/afs/cern.ch/user/s/sfer
 
       if ( itkmu > -1){
 
-	PtHLT -> Fill (((ev -> muons.at(imu).innerpt) - (ev -> tkmuons.at(itkmu).trkpt))/(ev -> muons.at(imu).innerpt));
-
+	PtHLT      -> Fill (((ev -> muons.at(imu).innerpt)    - (ev -> tkmuons.at(itkmu).trkpt))/(ev -> muons.at(imu).innerpt));
+	QoverPtHLT -> Fill (((1./ev -> muons.at(imu).innerpt) - (1./ev -> tkmuons.at(itkmu).trkpt))/(1./ev -> muons.at(imu).innerpt));
+	
 	if (fabs(ev -> muons.at(imu).eta) <= 0.9 ){
 	  PtHLT_barrel -> Fill (((ev -> muons.at(imu).innerpt) - (ev -> tkmuons.at(itkmu).trkpt))/(ev -> muons.at(imu).innerpt));
 	}

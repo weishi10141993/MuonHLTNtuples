@@ -26,9 +26,9 @@ bool matchMuon      (MuonCand, std::vector<HLTObjCand>, std::string);
 bool  matchMuonWithL3 (MuonCand, std::vector<HLTMuonCand>);
 void printProgBar(int);
 
-std::string L1filter      =  "hltL1fL1sMu22or25L1Filtered0::TEST"; 
+std::string L1filter      = "hltL1fL1sMu22or25L1Filtered0::TEST"; 
 std::string L2filter      = "hltL2fL1sMu22or25L1f0L2Filtered10Q::TEST";
-std::string L3filter      =  "hltL3fL1sMu22Or25L1f0L2f10QL3Filtered27Q::TEST"; 
+std::string L3filter      = "hltL3fL1sMu22Or25L1f0L2f10QL3Filtered27Q::TEST"; 
 std::string isofilterTag  = "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07::HLT";
 
 double pt_bins[17]  = { 5, 7, 9, 12, 16,  20 ,  24 ,  27 ,   30,   35,   40,   45,   50,  60, 70 ,  90, 150 };
@@ -483,8 +483,8 @@ bool selectMuon(MuonCand mu){
 bool selectProbeMuon(MuonCand mu, MuonCand tagMu, TH1F* dimuon_mass){
   
   if (mu.pt == tagMu.pt  && 
-      mu.pt == tagMu.eta &&
-      mu.pt == tagMu.phi ) 
+      mu.eta == tagMu.eta &&
+      mu.phi == tagMu.phi ) 
     return false;
   
   if (!( mu.pt          > 0  )) return false; 
