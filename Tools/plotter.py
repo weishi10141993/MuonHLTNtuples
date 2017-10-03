@@ -16,9 +16,13 @@ YMIN = 0.01
 YMAX = 1.02
 
 def makePlots(inputfiles,draw,title,legends,outname):
-    ROOT.gStyle.SetOptStat(0)
-    ROOT.gROOT.Reset()
-    #make canvas to save plots to
+    style = setTDRStyle()
+    ROOT.gStyle.SetTitleYOffset(1.45)
+    ROOT.gStyle.SetTitleXOffset(1.45)
+    ROOT.gStyle.SetOptFit(0)
+    ROOT.gStyle.SetStatX(.9)
+    ROOT.gStyle.SetStatY(.9)
+
     c1 = ROOT.TCanvas('c1')
     
     _files=[]
@@ -44,8 +48,8 @@ def makePlots(inputfiles,draw,title,legends,outname):
                 o.write('%s \t %5.4f + %5.4f - %5.4f\n' %(legends[i],_hist.GetEfficiency(1),_hist.GetEfficiencyErrorLow(1),_hist.GetEfficiencyErrorUp(1)))            
     o.close()
  
-#    leg = ROOT.TLegend(0.30,0.15,0.70,0.3);
-    leg = ROOT.TLegend(0.55,0.65,0.90,0.80);
+    leg = ROOT.TLegend(0.30,0.15,0.70,0.3);
+#    leg = ROOT.TLegend(0.55,0.65,0.90,0.80);
     leg.SetLineColor(0);
     leg.SetFillStyle(0);
     leg.SetBorderSize(0)
@@ -64,7 +68,7 @@ def makePlots(inputfiles,draw,title,legends,outname):
             if "Vs" in draw[0]:
                 hist.Draw("BOX")
             else: 
-                hist.Draw("HIST")
+                hist.Draw("")
             
             if "h_" not in draw[0]:
                 ROOT.gPad.Update()
@@ -73,13 +77,33 @@ def makePlots(inputfiles,draw,title,legends,outname):
                 graph.SetMaximum(YMAX)
                 ROOT.gPad.Update()
         else:
-            hist.Draw("HIST SAME")
+            hist.Draw("SAME")
 
         leg.AddEntry(hist,legends[k],"l")
         k+=1
     
     if len(_hists)>1:
         leg.Draw("SAME")
+
+    latex = ROOT.TLatex()
+    latex.SetTextFont(42)
+    latex.SetTextAlign(31)
+    latex.SetTextSize(0.04)
+    latex.SetNDC(True)
+    latexCMS = ROOT.TLatex()
+    latexCMS.SetTextFont(61)
+    latexCMS.SetTextSize(0.055)
+    latexCMS.SetNDC(True)
+    latexCMSExtra = ROOT.TLatex()
+    latexCMSExtra.SetTextFont(52)
+    latexCMSExtra.SetTextSize(0.03)
+    latexCMSExtra.SetNDC(True)    
+    latex.DrawLatex(0.95, 0.96, "(13 TeV)")
+    
+    cmsExtra = "Private" 
+    latexCMS.DrawLatex(0.78,0.88,"CMS")
+    yLabelPos = 0.84
+    latexCMSExtra.DrawLatex(0.78,yLabelPos,"%s"%(cmsExtra))
     
     c1.SaveAs(outname+".root");
     c1.SaveAs(outname+".pdf");

@@ -455,17 +455,17 @@ void MuonNtuples::fillHlt(const edm::Handle<edm::TriggerResults>   & triggerResu
     {
       std::string pathName = triggerNames.triggerName(itrig);
       
-      if ( pathName.find ("HLT_IsoMu"  ) !=std::string::npos ||
-           pathName.find ("HLT_Mu45"   ) !=std::string::npos ||
-           pathName.find ("HLT_Mu5"    ) !=std::string::npos ||
-           pathName.find ("HLT_TkMu5"  ) !=std::string::npos ||
-           pathName.find ("HLT_IsoTkMu") !=std::string::npos ||
-           pathName.find ("HLT_Mu17"   ) !=std::string::npos ||
-           pathName.find ("HLT_Mu8_T"  ) !=std::string::npos 
-      ){
-        if (isTag) event_.hltTag.triggers.push_back(pathName);
-        else       event_.hlt   .triggers.push_back(pathName);
-      }
+//      if ( pathName.find ("HLT_IsoMu"  ) !=std::string::npos ||
+//           pathName.find ("HLT_Mu"     ) !=std::string::npos ||
+//           pathName.find ("HLT_Mu5"    ) !=std::string::npos ||
+//           pathName.find ("HLT_TkMu5"  ) !=std::string::npos ||
+//           pathName.find ("HLT_IsoTkMu") !=std::string::npos ||
+//           pathName.find ("HLT_Mu17"   ) !=std::string::npos ||
+//           pathName.find ("HLT_Mu8_T"  ) !=std::string::npos 
+//      ){
+      if (isTag) event_.hltTag.triggers.push_back(pathName);
+      else       event_.hlt   .triggers.push_back(pathName);
+//      }
     }
   }
      
@@ -475,15 +475,12 @@ void MuonNtuples::fillHlt(const edm::Handle<edm::TriggerResults>   & triggerResu
   {
     std::string filterTag = triggerEvent->filterTag(iFilter).encode();
 
-    if ( ( filterTag.find ("sMu22"     ) !=std::string::npos ||
-           filterTag.find ("sMu25"     ) !=std::string::npos 
-//            filterTag.find ("DoubleMu"  ) !=std::string::npos ||
-//            filterTag.find ("DiMuonGlb" ) !=std::string::npos
-           ) && 
-           filterTag.find ("Tau"       ) ==std::string::npos   &&
-           filterTag.find ("EG"        ) ==std::string::npos   &&
-           filterTag.find ("MultiFit"  ) ==std::string::npos  
-       )   
+    if ( ( filterTag.find ("Mu"     ) !=std::string::npos)
+	 && 
+	 filterTag.find ("Tau"       ) ==std::string::npos   &&
+	 filterTag.find ("EG"        ) ==std::string::npos   &&
+	 filterTag.find ("MultiFit"  ) ==std::string::npos  
+	 )   
     {
       trigger::Keys objectKeys = triggerEvent->filterKeys(iFilter);
       const trigger::TriggerObjectCollection& triggerObjects(triggerEvent->getObjects());

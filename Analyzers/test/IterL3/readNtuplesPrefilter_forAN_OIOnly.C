@@ -24,17 +24,17 @@ enum Sig {
   DisplacedNew,
 };
 
-bool selectTagMuon  (GenParticleCand, TH1F* );
-bool selectProbeMuon(GenParticleCand, GenParticleCand, TH1F* );
-bool selectMuon     (GenParticleCand);
-bool selectHLTMuon  (HLTMuonCand,int);
-bool matchMuon      (GenParticleCand, std::vector<HLTObjCand>, std::string);
-bool firedL1        (                 std::vector<HLTObjCand>, std::string);
-bool matchMuonWithL3(GenParticleCand, std::vector<HLTMuonCand>);
-bool matchL3MuonWithGen(HLTMuonCand, std::vector<GenParticleCand>);
+bool selectTagMuon  (MuonCand, TH1F* );
+bool selectProbeMuon(MuonCand, MuonCand, TH1F* );
+bool selectMuon     (MuonCand);
+bool selectGenMuon  (GenParticleCand);
+bool matchMuon      (MuonCand, std::vector<HLTObjCand>, std::string);
+bool firedL1        (          std::vector<HLTObjCand>, std::string);
+bool matchMuonWithL3(MuonCand, std::vector<HLTMuonCand>);
 std::string getProbeFilter(int);
 float getLeadingPtCut(int);
 float getTrailingPtCut(int);
+
 void printProgBar(int);
 
 double pt_bins[17]  = { 5, 7, 9, 12, 16,  20 ,  24 ,  27 ,   30,   35,   40,   45,   50,  60, 70 ,  90, 150 };
@@ -45,7 +45,7 @@ double offlineIsoCut = 0.15;
 
 
 /// TAG-DEFINITION: 
-std::string isofilterTag  = "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p09::HLT";
+std::string isofilterTag  = "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07::HLT";
 
 /// for PROMPT-MUONS   (close-by and far-away) 
 std::string L1filter      = "hltL1fL1sMu22or25L1Filtered0::TEST"; 
@@ -82,7 +82,7 @@ float offlinePtCut         = 28.;
 //                                          *
 // ******************************************
 
-void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int flavor=Sig::Prompt,  std::string effmeasured="IterL3_NOHP_NOL1"){
+void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="results.root", int flavor=Sig::Prompt,  std::string effmeasured="IterL3_NOHP_NOL1"){
 
   bool doingL1 = thepassfilter.find("L1fL1") != std::string::npos; 
 
@@ -95,6 +95,8 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
   TH1F* tagMuonPt               = new TH1F("h_tagMuonPt"            ,"tagMuonPt"        ,  150,  0,  150 );
   TH1F* nvtx_event              = new TH1F("h_nvtx_event"           ,"nvtx_event"       ,   60,  0,   60 );
  
+  TEfficiency* muonPt_barrel    = new TEfficiency("muonPt_barrel"   ,"muonPt_barrel"    ,   16,  pt_bins );
+  TEfficiency* muonPt_endcap    = new TEfficiency("muonPt_endcap"   ,"muonPt_endcap"    ,   16,  pt_bins );
   TEfficiency* muonPt           = new TEfficiency("muonPt"          ,"muonPt"           ,   16,  pt_bins ); 
   TEfficiency* muonPtTurnOn     = new TEfficiency("muonPtTurnOn"    ,"muonPtTurnOn"     ,   16,  pt_bins ); 
   TEfficiency* muonEta          = new TEfficiency("muonEta"         ,"muonEta"          ,   15, eta_bins );
@@ -103,27 +105,31 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
   TEfficiency* muonDeltaR       = new TEfficiency("muonDeltaR"      ,"muonDeltaR"       ,   30,   0., 3.0);
   TEfficiency* muonDeltaPhi     = new TEfficiency("muonDeltaPhi"    ,"muonDeltaPhi"     ,   30,   0., 3.2); 
 
+  // GLOBAL QUANTITIES//
+  TEfficiency* muonchi2         = new TEfficiency("muonchi2"        , "muonchi2"        ,  60,    0.,  7.);
+  TEfficiency* muondxy          = new TEfficiency("muondxy"         , "muondxy"         ,  100,  -0.3, 0.3);
+  TEfficiency* muondz           = new TEfficiency("muondz"          , "muondz"          ,   10,   dz_bins);
+  TEfficiency* muonPixHit       = new TEfficiency("muonPixHit"      , "muonPixHit"      ,   20,  -0.5,19.5);
+  TEfficiency* muonLayHit       = new TEfficiency("muonLayHit"      , "muonLayHit"      ,   16,   2.5,18.5);
+  TEfficiency* muonPixLay       = new TEfficiency("muonPixLay"      , "muonPixLay"      ,    7,  -0.5, 6.5);
+  TEfficiency* muoninnerPt      = new TEfficiency("muoninnerPt"     , "muoninnerPt"     ,   16,   pt_bins );
+  TEfficiency* muoninnerEta     = new TEfficiency("muoninnerEta"    , "muoninnerEta"    ,   15,   eta_bins);
+  TEfficiency* muoninnerPhi     = new TEfficiency("muoninnerPhi"    , "muoninnerPhi"    ,   20,  -3.2, 3.2);
+  
   TEfficiency* failingMuonPt    = new TEfficiency("failingMuonPt"   ,"failingMuonPt"    ,   16,  pt_bins ); 
   TEfficiency* failingMuonEta   = new TEfficiency("failingMuonEta"  ,"failingMuonEta"   ,   15, eta_bins );
   TEfficiency* failingMuonPhi   = new TEfficiency("failingMuonPhi"  ,"failingMuonPhi"   ,   20, -3.2, 3.2);
   TEfficiency* failingMuonEff   = new TEfficiency("failingMuonEff"  ,"failingMuonEff"   ,   1 ,   0., 1.0);
 
-  TEfficiency* fakeMuonPt    = new TEfficiency("fakeMuonPt"   ,"fakeMuonPt"    ,   16,  pt_bins ); 
-  TEfficiency* fakeMuonEta   = new TEfficiency("fakeMuonEta"  ,"fakeMuonEta"   ,   15, eta_bins );
-  TEfficiency* fakeMuonPhi   = new TEfficiency("fakeMuonPhi"  ,"fakeMuonPhi"   ,   20, -3.2, 3.2);
-  TEfficiency* fakeMuonEff   = new TEfficiency("fakeMuonEff"  ,"fakeMuonEff"   ,   1 ,   0., 1.0);
-
   TH1F* PassingProbePt          = new TH1F("h_PassingProbePt"       ,"PassingMuonPt"    ,  16,  pt_bins );
   TH1F* PassingProbeEta         = new TH1F("h_PassingProbeEta"      ,"PassingMuonEta"   ,  15, eta_bins );
   TH1F* PassingProbePhi         = new TH1F("h_PassingProbePhi"      ,"PassingMuonPhi"   ,  20, -3.2, 3.2);
-  TH1F* PassingProbeMll         = new TH1F("h_PassingProbeMll"      ,"PassingMuonMll"   ,  40, 60., 120.); 
-  TH1F* PassingProbeDeltaR      = new TH1F("h_PassingProbeDeltaR"   ,"PassingMuonDeltaR",  30,  0.,  3.0); 
+  TH1F* PassingProbeMll         = new TH1F("h_PassingProbeMll"      ,"PassingMuonMll"   ,  20,  86., 96.); 
 
   TH1F* FailingProbePt          = new TH1F("h_FailingProbePt"       ,"FailingMuonPt"    ,  16,  pt_bins );
   TH1F* FailingProbeEta         = new TH1F("h_FailingProbeEta"      ,"FailingMuonEta"   ,  15, eta_bins );
   TH1F* FailingProbePhi         = new TH1F("h_FailingProbePhi"      ,"FailingMuonPhi"   ,  20, -3.2, 3.2);
-  TH1F* FailingProbeMll         = new TH1F("h_FailingProbeMll"      ,"FailingMuonMll"   ,  40,  60., 120.);
-  TH1F* FailingProbeDeltaR      = new TH1F("h_FailingProbeDeltaR"   ,"FailingMuonDeltaR",  30,  0.,  3.0); 
+  TH1F* FailingProbeMll         = new TH1F("h_FailingProbeMll"      ,"FailingMuonMll"   ,  20,  86., 96.);
 
   // di-muon efficiencies 
   TEfficiency* diMuonPt         = new TEfficiency("diMuonPt"      ,"diMuonPt"       ,   16,  pt_bins  , 16,  pt_bins ); 
@@ -137,7 +143,7 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
   TEfficiency* diMuonTrailPt    = new TEfficiency("diMuonTrailPt" ,"diMuonTrailPt"  ,   16,  pt_bins ); 
   TEfficiency* diMuonTrailEta   = new TEfficiency("diMuonTrailEta","diMuonTrailEta" ,   15, eta_bins );
   TEfficiency* diMuonTrailPhi   = new TEfficiency("diMuonTrailPhi","diMuonTrailPhi" ,   20, -3.2, 3.2);
-  
+
   TEfficiency* nvtx             = new TEfficiency("nvtx"             ,"nvtx"             ,   60,    0,  60);
   TEfficiency* nvtx_barrel      = new TEfficiency("nvtx_barrel"      ,"nvtx_barrel"      ,   60,    0,  60);
   TEfficiency* nvtx_endcap      = new TEfficiency("nvtx_endcap"      ,"nvtx_endcap"      ,   60,    0,  60);
@@ -161,139 +167,116 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
   int nentries = tree->GetEntriesFast();
   std::cout << "Number of entries = " << nentries << std::endl;
 
+  bool flagfile = false;
   std::string theprobefilter = getProbeFilter(flavor);
   offlinePtCut = getLeadingPtCut(flavor);
   float ptcut1 = getLeadingPtCut(flavor);
   float ptcut2 = getTrailingPtCut(flavor);
-      
+	
   for (Int_t eventNo=0; eventNo < nentries; eventNo++)     {
     Int_t IgetEvent   = tree   -> GetEvent(eventNo);
-    if (!debug) printProgBar((int)(eventNo*100./nentries));
-    if (debug && eventNo==100) break;
-
+    printProgBar((int)(eventNo*100./nentries));
+    
+    unsigned int nmuons = ev->muons.size(); 
+    if (nmuons < 2) continue; 
     nvtx_event-> Fill( ev -> nVtx   ); 
-    unsigned int nmuons = ev->genParticles.size();
     for (int imu = 0; imu < nmuons; imu++){ 
-      if (! selectTagMuon(ev->genParticles.at(imu), tagiso)) continue; 
-      if (! matchMuon(ev->genParticles.at(imu), ev-> hltTag.objects, isofilterTag)) continue;
-
-      tagMuonPt -> Fill ( ev->genParticles.at(imu).pt) ; 
+      // select the tag muon        
+      if (debug) cout <<"select Tag muon" << endl;
+      if (! selectTagMuon(ev -> muons.at(imu), tagiso)) continue; 
+      
+      if (! matchMuon(ev -> muons.at(imu), ev -> hltTag.objects, isofilterTag)) continue;
+      tagMuonPt -> Fill ( ev -> muons.at(imu).pt) ; 
       
       for (int jmu = 0; jmu < nmuons; jmu++){
 	bool pass   = false;
 	
 	// select the probe muon  & match to the probe:  
-	if (!selectProbeMuon(ev->genParticles.at(jmu), ev->genParticles.at(imu), dimuon_mass)) continue;
-	if (!doingL1 && !(matchMuon(ev->genParticles.at(jmu), ev-> hlt.objects, theprobefilter))) continue;	
+	if (!selectProbeMuon(ev -> muons.at(jmu), ev -> muons.at(imu), dimuon_mass)) continue;
+	if (!doingL1 && !(matchMuon(ev -> muons.at(jmu), ev -> hlt.objects, theprobefilter))) continue;	
 	
 	// select the pass muon
-	if (matchMuonWithL3(ev->genParticles.at(jmu),ev->hltmuons)) pass = true;
+	if (matchMuonWithL3(ev->muons.at(jmu),ev->hltOImuons)) pass = true;
 	
-	muonPtTurnOn -> Fill( pass, ev->genParticles.at(jmu).pt ); 
-	if (ev->genParticles.at(jmu).pt < ptcut1) continue;
+	muonPtTurnOn -> Fill( pass, ev -> muons.at(jmu).pt ); 
+	if (ev -> muons.at(jmu).pt < offlinePtCut) continue;
 	
 	TLorentzVector mu1, mu2;
-	mu1.SetPtEtaPhiM (ev->genParticles.at(imu).pt,ev->genParticles.at(imu).eta,ev->genParticles.at(imu).phi, muonmass); 
-	mu2.SetPtEtaPhiM (ev->genParticles.at(jmu).pt,ev->genParticles.at(jmu).eta,ev->genParticles.at(jmu).phi, muonmass);
+	mu1.SetPtEtaPhiM (ev->muons.at(imu).pt,ev->muons.at(imu).eta,ev->muons.at(imu).phi, muonmass); 
+	mu2.SetPtEtaPhiM (ev->muons.at(jmu).pt,ev->muons.at(jmu).eta,ev->muons.at(jmu).phi, muonmass);
 	double mumumass = (mu1 + mu2).M();
 	double DeltaR   = mu1.DeltaR(mu2);
 	double DeltaPhi = mu1.DeltaPhi(mu2);
 
 	if (pass) { 
-	  PassingProbePt    -> Fill( ev->genParticles.at(jmu).pt  );
-	  PassingProbeEta   -> Fill( ev->genParticles.at(jmu).eta );
-	  PassingProbePhi   -> Fill( ev->genParticles.at(jmu).phi );
-	  PassingProbeMll   -> Fill( mumumass                );
-	  PassingProbeDeltaR-> Fill( DeltaR );
+	  PassingProbePt  -> Fill( ev -> muons.at(jmu).pt  );
+	  PassingProbeEta -> Fill( ev -> muons.at(jmu).eta );
+	  PassingProbePhi -> Fill( ev -> muons.at(jmu).phi );
+	  PassingProbeMll -> Fill( mumumass                );
 	}	      
 	else {       
-	  FailingProbePt    -> Fill( ev->genParticles.at(jmu).pt  );
-	  FailingProbeEta   -> Fill( ev->genParticles.at(jmu).eta );
-	  FailingProbePhi   -> Fill( ev->genParticles.at(jmu).phi );
-	  FailingProbeMll   -> Fill( mumumass                );
-	  FailingProbeDeltaR-> Fill( DeltaR );
+	  FailingProbePt  -> Fill( ev -> muons.at(jmu).pt  );
+	  FailingProbeEta -> Fill( ev -> muons.at(jmu).eta );
+	  FailingProbePhi -> Fill( ev -> muons.at(jmu).phi );
+	  FailingProbeMll -> Fill( mumumass                );
 	}
 	
-	muonPt       -> Fill( pass, ev->genParticles.at(jmu).pt );
-	muonEta      -> Fill( pass, ev->genParticles.at(jmu).eta);
-	muonPhi      -> Fill( pass, ev->genParticles.at(jmu).phi);
+	muonPt       -> Fill( pass, ev -> muons.at(jmu).pt );
+	muonEta      -> Fill( pass, ev -> muons.at(jmu).eta);
+	muonPhi      -> Fill( pass, ev -> muons.at(jmu).phi);
 	muonEff      -> Fill( pass, 0.5                    );
 	muonDeltaR   -> Fill( pass, DeltaR);
 	muonDeltaPhi -> Fill( pass, DeltaPhi);
+
+
+	muoninnerPt  -> Fill( pass, ev -> muons.at(jmu).innerpt);
+	muoninnerEta -> Fill( pass, ev -> muons.at(jmu).innereta); 
+	muoninnerPhi -> Fill( pass, ev -> muons.at(jmu).innerphi); 
 	
-	failingMuonPt  -> Fill( !pass, ev->genParticles.at(jmu).pt );
-	failingMuonEta -> Fill( !pass, ev->genParticles.at(jmu).eta);
-	failingMuonPhi -> Fill( !pass, ev->genParticles.at(jmu).phi);
+	muonchi2   -> Fill( pass, ev -> muons.at(jmu).innerchi2 );
+	muondxy    -> Fill( pass, ev -> muons.at(jmu).innerdxy);
+	muondz     -> Fill( pass, ev -> muons.at(jmu).innerdz);
+	muonPixHit -> Fill( pass, ev -> muons.at(jmu).innerpixelHits);
+	muonLayHit -> Fill( pass, ev -> muons.at(jmu).innerlayerHits);
+	muonPixLay -> Fill( pass, ev -> muons.at(jmu).innerpixelLayers);
+
+	failingMuonPt  -> Fill( !pass, ev->muons.at(jmu).pt );
+	failingMuonEta -> Fill( !pass, ev->muons.at(jmu).eta);
+	failingMuonPhi -> Fill( !pass, ev->muons.at(jmu).phi);
 	failingMuonEff -> Fill( !pass, 0.5                    );
+
       } // nmuons
     }
     
-    /// Now FOR DIMUONS (Using HLT info):
+    /// NOW FOR DIMUONS:
     // both should pass the L1 filter! 
-    if (debug) cout << "fired L1?" << endl;
-    if (firedL1(ev-> hlt.objects, theprobefilter)) { 
-      if (debug) cout << "YES!" << endl;      
-      for (int imu=0; imu<ev->hltmuons.size(); imu++){ 
-	bool fake = false;
-	if (!matchL3MuonWithGen(ev->hltmuons.at(imu), ev->genParticles)) fake = true;
-	fakeMuonPt  -> Fill( fake, ev->hltmuons.at(imu).pt );
-	if (ev->hltmuons.at(imu).pt > ptcut1) { 
-	  fakeMuonEta -> Fill( fake, ev->hltmuons.at(imu).eta);
-	  fakeMuonPhi -> Fill( fake, ev->hltmuons.at(imu).phi);
-	  fakeMuonEff -> Fill( fake, 0.5                     );
-	}
-	for (int jmu=imu+1; jmu<ev->hltmuons.size(); jmu++){ 
+    if (firedL1(ev -> hlt.objects, theprobefilter)) { 
+      for (int imu = 0; imu < nmuons; imu++){
+	if (!selectMuon(ev -> muons.at(imu))) continue; 
+	for (int jmu = imu+1; jmu < nmuons; jmu++){
+	  if (!selectMuon(ev -> muons.at(jmu))) continue; 
 	  bool pass = false;
-	  if (matchL3MuonWithGen(ev->hltmuons.at(imu),ev->genParticles) && 
-	      matchL3MuonWithGen(ev->hltmuons.at(jmu),ev->genParticles)) pass = true;
+	  if (matchMuonWithL3(ev->muons.at(jmu),ev->hltOImuons) && 
+	      matchMuonWithL3(ev->muons.at(imu),ev->hltOImuons)) pass = true;
 	  
-	  double DeltaR = deltaR(ev->hltmuons.at(imu).eta,ev->hltmuons.at(imu).phi,ev->hltmuons.at(jmu).eta,ev->hltmuons.at(jmu).phi);
-	  diMuonPt       -> Fill( pass, ev->hltmuons.at(imu).pt , ev->hltmuons.at(jmu).pt  ); 
-	  diMuonLeadPt   -> Fill( pass, ev->hltmuons.at(imu).pt ); 
-	  diMuonTrailPt  -> Fill( pass, ev->hltmuons.at(jmu).pt ); 
+	  double DeltaR = deltaR(ev->muons.at(imu).eta,ev->muons.at(imu).phi,ev->muons.at(jmu).eta,ev->muons.at(jmu).phi);
+	  diMuonPt       -> Fill( pass, ev->muons.at(imu).pt , ev->muons.at(jmu).pt  ); 
+	  diMuonLeadPt   -> Fill( pass, ev->muons.at(imu).pt ); 
+	  diMuonTrailPt  -> Fill( pass, ev->muons.at(jmu).pt ); 
 	  
-	  if (ev->hltmuons.at(imu).pt < ptcut1) continue;
-	  if (ev->hltmuons.at(jmu).pt < ptcut2) continue;
-	  diMuonEta      -> Fill( pass, ev->hltmuons.at(imu).eta, ev->hltmuons.at(jmu).eta );
-	  diMuonPhi      -> Fill( pass, ev->hltmuons.at(imu).phi, ev->hltmuons.at(jmu).phi );
+	  if (ev->muons.at(imu).pt < ptcut1) continue;
+	  if (ev->muons.at(jmu).pt < ptcut2) continue;
+	  diMuonEta      -> Fill( pass, ev->muons.at(imu).eta, ev->muons.at(jmu).eta );
+	  diMuonPhi      -> Fill( pass, ev->muons.at(imu).phi, ev->muons.at(jmu).phi );
 	  diMuonDeltaR   -> Fill( pass, DeltaR);
 	  diMuonEff      -> Fill( pass, 0.5);
 	  
-	  diMuonLeadEta  -> Fill( pass, ev->hltmuons.at(imu).eta ); 
-	  diMuonTrailEta -> Fill( pass, ev->hltmuons.at(jmu).eta ); 
-	  diMuonLeadPhi  -> Fill( pass, ev->hltmuons.at(imu).phi ); 
-	  diMuonTrailPhi -> Fill( pass, ev->hltmuons.at(jmu).phi ); 
+	  diMuonLeadEta  -> Fill( pass, ev->muons.at(imu).eta ); 
+	  diMuonTrailEta -> Fill( pass, ev->muons.at(jmu).eta ); 
+	  diMuonLeadPhi  -> Fill( pass, ev->muons.at(imu).phi ); 
+	  diMuonTrailPhi -> Fill( pass, ev->muons.at(jmu).phi ); 
 	}
       }
-      /*
-	for (int imu = 0; imu < nmuons; imu++){
-	if (!selectMuon(ev->genParticles.at(imu))) continue; 
-	for (int jmu = imu+1; jmu < nmuons; jmu++){
-	if (!selectMuon(ev->genParticles.at(jmu))) continue; 
-	bool pass = false;
-	if (matchMuonWithL3(ev->genParticles.at(jmu),ev->hltmuons) && 
-	matchMuonWithL3(ev->genParticles.at(imu),ev->hltmuons)) pass = true;
-	
-	if (ev->genParticles.at(imu).pt  == ev->genParticles.at(jmu).pt)  continue;
-	if (ev->genParticles.at(imu).eta == ev->genParticles.at(jmu).eta) continue;
-	if (ev->genParticles.at(imu).phi == ev->genParticles.at(jmu).phi) continue;
-	
-	double DeltaR   = deltaR(ev->genParticles.at(imu).eta,ev->genParticles.at(imu).phi,ev->genParticles.at(jmu).eta,ev->genParticles.at(jmu).phi);
-	h_diMuonDeltaR -> Fill( DeltaR );
-	
-	diMuonPt       -> Fill( pass, ev->genParticles.at(imu).pt ); 
-	diMuonEta      -> Fill( pass, ev->genParticles.at(imu).eta);
-	diMuonPhi      -> Fill( pass, ev->genParticles.at(imu).phi);
-	diMuonPt       -> Fill( pass, ev->genParticles.at(jmu).pt );
-	diMuonEta      -> Fill( pass, ev->genParticles.at(jmu).eta);
-	diMuonPhi      -> Fill( pass, ev->genParticles.at(jmu).phi);
-	diMuonDeltaR   -> Fill( pass, DeltaR);
-	diMuonDeltaR   -> Fill( pass, DeltaR);
-	diMuonEff      -> Fill( pass, 0.5);
-	diMuonEff      -> Fill( pass, 0.5);
-	}
-	}
-      */
     }
   }  
   
@@ -309,28 +292,32 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
   muonDeltaR        -> Write();
   muonDeltaPhi      -> Write();
 
+
+  muonchi2     -> Write();
+  muondxy      -> Write();
+  muondz       -> Write();
+  muonPixHit   -> Write();
+  muonLayHit   -> Write();
+  muonPixLay   -> Write();
+  muoninnerPt  -> Write();
+  muoninnerEta -> Write();
+  muoninnerPhi -> Write();
+
   failingMuonPt   -> Write();
   failingMuonEta  -> Write();
   failingMuonPhi  -> Write();
   failingMuonEff  -> Write();
 
-  fakeMuonPt   -> Write();
-  fakeMuonEta  -> Write();
-  fakeMuonPhi  -> Write();
-  fakeMuonEff  -> Write();
-
   PassingProbePt  -> Write();
   PassingProbeEta -> Write();
   PassingProbePhi -> Write();
   PassingProbeMll -> Write();
-  PassingProbeDeltaR -> Write();
   
   FailingProbePt  -> Write();
   FailingProbeEta -> Write();
   FailingProbePhi -> Write();
   FailingProbeMll -> Write();
-  FailingProbeDeltaR -> Write();
-
+  
   /// Per-event (di-muon) efficiency.
   diMuonPt         -> Write();
   diMuonEta        -> Write();
@@ -343,7 +330,6 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
   diMuonTrailPt    -> Write(); 
   diMuonTrailEta   -> Write();
   diMuonTrailPhi   -> Write();
-
   nvtx_event       -> Write();
   nvtx             -> Write();
   
@@ -357,12 +343,11 @@ void readNtuplesPrefilter_forAN_isMC(TString inputfilename="results.root", int f
 bool firedL1( std::vector<HLTObjCand> toc, std::string L1FilterName){ 
   int ntoc = toc.size();
   for ( std::vector<HLTObjCand>::const_iterator it = toc.begin(); it != toc.end(); ++it ) { 
-    if (debug) cout << it->filterTag << " = " << L1FilterName << endl;
     if ( it->filterTag.compare(L1FilterName) == 0) return true;
   }
   return false;
 }
-bool matchMuon(GenParticleCand mu, std::vector<HLTObjCand> toc, std::string tagFilterName){
+bool matchMuon(MuonCand mu, std::vector<HLTObjCand> toc, std::string tagFilterName){
 
   bool match = false;
   int ntoc = toc.size();
@@ -371,9 +356,7 @@ bool matchMuon(GenParticleCand mu, std::vector<HLTObjCand> toc, std::string tagF
   if (tagFilterName.find("L1fL1") != std::string::npos) minDR = 1.0;
   float theDR = 100;
   for ( std::vector<HLTObjCand>::const_iterator it = toc.begin(); it != toc.end(); ++it ) { 
-    //if (debug) cout << tagFilterName << " = " << it->filterTag << " ? " << endl;
     if ( it->filterTag.compare(tagFilterName) == 0) { 
-      //      if (debug) cout << " YES" << endl;
       theDR = deltaR(it -> eta, it -> phi, mu.eta, mu.phi);
       if (theDR < minDR){
         minDR = theDR;
@@ -385,15 +368,21 @@ bool matchMuon(GenParticleCand mu, std::vector<HLTObjCand> toc, std::string tagF
   return match;
 }
 
-bool selectTagMuon(GenParticleCand mu, TH1F* tagh){
-  if (!( fabs(mu.pdgId) == 13)) return false;
+bool selectTagMuon(MuonCand mu, TH1F* tagh){
+  
   if (!( mu.pt         > offlinePtCut)) return false; 
   if (!( fabs(mu.eta)  < 2.4 )) return false; 
+  if (!( mu.isTight    == 1  )) return false; 
   
   //add isolation cut
-  tagh -> Fill(0.);
+  float offlineiso04 = mu.chargedDep_dR04 + std::max(0., mu.photonDep_dR04 + mu.neutralDep_dR04 - 0.5*mu.puPt_dR04);
+  offlineiso04       = offlineiso04 / mu.pt;
+  tagh -> Fill(offlineiso04);
+  if (offlineiso04   > offlineIsoCut) return false; 
+
   return true;
 }
+
 float getLeadingPtCut(int signature){ 
   float ptcut = 0.;
   if (signature == Sig::Prompt) ptcut = 29.;
@@ -410,36 +399,49 @@ float getTrailingPtCut(int signature){
   return ptcut;
 }
 
-bool selectMuon(GenParticleCand mu){  
-  if (!( fabs(mu.pdgId) == 13))           return false;
+
+bool selectMuon(MuonCand mu){  
   if (!( mu.pt         > offlinePtCut  )) return false; 
-  if (!( fabs(mu.eta)  < 2.4 ))           return false;
+  if (!( fabs(mu.eta)  < 2.4 )) return false;
+  if (!( mu.isLoose    == 1  )) return false; 
   return true;
 }
 
+bool selectGenMuon(GenParticleCand mu){
+  if (!( fabs(mu.pdgId) == 13)) return false;
+  if (!( mu.pt         > offlinePtCut  )) return false; 
+  if (!( fabs(mu.eta)  < 2.4 )) return false;
+  return true;
+}
 
 //select the probe muon
-bool selectProbeMuon(GenParticleCand mu, GenParticleCand tagMu, TH1F* dimuon_mass){
+bool selectProbeMuon(MuonCand mu, MuonCand tagMu, TH1F* dimuon_mass){
   
-  if (mu.pt  == tagMu.pt  && 
+  if (mu.pt == tagMu.pt  && 
       mu.eta == tagMu.eta &&
       mu.phi == tagMu.phi ) 
     return false;
   
+  if (!( mu.pt          > 0  )) return false; 
   if (!( fabs(mu.eta)  < 2.4 )) return false; 
-  if (mu.pdgId * tagMu.pdgId > 0) return false;
+  if (!( mu.isTight    == 1  )) return false; 
+  if (mu.charge * tagMu.charge > 0) return false;
+  //add isolation cut
+  float offlineiso04 = mu.chargedDep_dR04 + std::max(0., mu.photonDep_dR04 + mu.neutralDep_dR04 - 0.5*mu.puPt_dR04);
+  offlineiso04       = offlineiso04 / mu.pt;
+  if (offlineiso04   > offlineIsoCut) return false; 
   
   TLorentzVector mu1, mu2;
   mu1.SetPtEtaPhiM (mu.pt   , mu.eta   , mu.phi   , muonmass);
   mu2.SetPtEtaPhiM (tagMu.pt, tagMu.eta, tagMu.phi, muonmass);
   double mumumass = (mu1 + mu2).M();
   dimuon_mass -> Fill(mumumass); 
-  if (! (mumumass > 80. && mumumass < 110. )) return false;
+  if (! (mumumass > 86. && mumumass < 96. )) return false;
   
   return true;
 }
 
-bool matchMuonWithL3(GenParticleCand mu, std::vector<HLTMuonCand> L3cands){
+bool matchMuonWithL3(MuonCand mu, std::vector<HLTMuonCand> L3cands){
 
   bool match = false;
   float minDR = 0.1;
@@ -453,22 +455,6 @@ bool matchMuonWithL3(GenParticleCand mu, std::vector<HLTMuonCand> L3cands){
   }
   return match;
 }
-bool matchL3MuonWithGen(HLTMuonCand mu, std::vector<GenParticleCand> Gencands){
-
-  bool match = false;
-  float minDR = 0.1;
-  float theDR = 100;
-  for ( std::vector<GenParticleCand>::const_iterator it = Gencands.begin(); it != Gencands.end(); ++it ) { 
-    theDR = deltaR(it -> eta, it -> phi, mu.eta, mu.phi); 
-    if (theDR < minDR){ 
-      minDR = theDR;
-      match = true;
-    }
-  }
-  return match;
-}
-
-
 std::string getProbeFilter(int signature){
   if (signature == Sig::Prompt) { 
     return "hltL1fL1sMu22or25L1Filtered0::TEST"; //Prompt
