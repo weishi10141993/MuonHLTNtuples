@@ -16,7 +16,7 @@ hltGetConfiguration /online/collisions/2017/2e34/v3.0/HLT/V16 --input file:/path
 
 Then at the end of it you should add different lines to run the Ntuple-producer or the Debugger: 
 
-# Produce Ntuples: 
+## Produce Ntuples: 
 process.muonNtuples = cms.EDAnalyzer("MuonNtuples",
                        offlineVtx               = cms.InputTag("offlinePrimaryVertices"),
                        offlineMuons             = cms.InputTag("muons"),
@@ -49,8 +49,8 @@ process.HLTValidation = cms.EndPath(
 
 Then you can run the configuration file with cmsRun locally, using the bacth (Tools/submitJobs.py) or using crab (i.e. Tools/crab_HLTMC_eff_multicrab_cfg.py). 
 
-# Run debugger (for event-by-event comparison) 
+## Run debugger (for event-by-event comparison) 
 
-# Plotter and other Tols
+## Plotter and other Tols
 
 The 
