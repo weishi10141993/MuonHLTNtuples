@@ -53,8 +53,7 @@ Then you can run the configuration file with cmsRun locally, using the bacth (To
 
 You need to add the following lines at the end of your configuration file: 
 
-##from RecoMuon.TrackingTools.MuonServiceProxy_cff import *
-
+from RecoMuon.TrackingTools.MuonServiceProxy_cff import *
 process.muonDebugger =cms.EDAnalyzer("MuonHLTDebugger",
                                      MuonServiceProxy,
                                      triggerResults  = cms.untracked.InputTag("TriggerResults::SFHLT"),
@@ -78,6 +77,10 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("muonDebugger_MC_IterL3.root"),
                                    closeFileFast = cms.untracked.bool(False)
                                    )
+
+process.HLTValidation = cms.EndPath(
+    process.muonDebugger
+)
 
 ## Plotter and other Tols
 
