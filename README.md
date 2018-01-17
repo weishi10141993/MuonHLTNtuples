@@ -10,9 +10,9 @@ git checkout -b YOUR_BRANCH_NAME
 cd ..  
 scramv1 b   
 
-First thing to do is to download a configuration file with the desired HLT paths, here an example: 
+First thing to do is to download a configuration file with the desired HLT paths, extract an HLT configuration from ConfDB using the hltGetConfiguration script, here an example: 
 
-hltGetConfiguration /online/collisions/2017/2e34/v4.2/HLT/V6 --input file:/eos/cms/store/user/folguera/ROOT/BA7BEDED-948E-E711-AFC7-02163E011FAF.root  --paths HLTriggerFirstPath,HLT_IsoMu27_v14,HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v13,HLT_Mu50_v12,HLT_DoubleMu43NoFiltersNoVtx_v3,HLT_Dimuon25_Jpsi_v13,DST_DoubleMu3_noVtx_CaloScouting_v5,HLTriggerFinalPath --output none --full --offline --data --unprescale --process TEST --globaltag auto:run2_hlt_GRun
+hltGetConfiguration /online/collisions/2017/2e34/v4.2/HLT/V6 --input file:/eos/cms/store/user/folguera/ROOT/BA7BEDED-948E-E711-AFC7-02163E011FAF.root  --paths HLTriggerFirstPath,HLT_IsoMu27_v14,HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v13,HLT_Mu50_v12,HLT_DoubleMu43NoFiltersNoVtx_v3,HLT_Dimuon25_Jpsi_v13,DST_DoubleMu3_noVtx_CaloScouting_v5,HLTriggerFinalPath --output none --full --offline --data --unprescale --process TEST --globaltag auto:run2_hlt_GRun > hltConfig.py
 
 Then at the end of it you should add different lines to run the Ntuple-producer or the Debugger: 
 
