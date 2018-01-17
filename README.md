@@ -47,7 +47,7 @@ process.HLTValidation = cms.EndPath(
     process.muonNtuples
 )
 
-Then you can run the configuration file with cmsRun locally, using the bacth (Tools/submitJobs.py) or using crab (i.e. Tools/crab_HLTMC_eff_multicrab_cfg.py). 
+Then you can run the configuration file with cmsRun locally, using the batch (Tools/submitJobs.py) or using crab (i.e. Tools/crab_HLTMC_eff_multicrab_cfg.py). 
 
 ## Run debugger (for event-by-event comparison) 
 
