@@ -1,7 +1,7 @@
 # MuonHLTNtuples
 
-cmsrel CMSSW_X_Y_Z  (-> update to the appropriate CMSSW version!)   
-cd CMSSW_X_Y_Z/src  
+cmsrel CMSSW_9_2_15  (-> update to the appropriate CMSSW version!)   
+cd CMSSW_9_2_15/src  
 cmsenv    
 git cms-addpkg HLTrigger/Configuration    
 git clone git@github.com:folguera/MuonHLTNtuples.git    
