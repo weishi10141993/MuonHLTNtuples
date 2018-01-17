@@ -4,6 +4,7 @@ config = config()
 
 config.JobType.pluginName   = 'Analysis'
 config.JobType.outputFiles  = ['muonNtuple.root']#, 'DQMIO.root']
+config.JobType.psetName = '/afs/cern.ch/work/w/wshi/public/MuHLTIterL3/CMSSW_9_2_15/src/hltConfig.py'
 
 config.Data.unitsPerJob     = 10000
 config.Data.totalUnits      = 2000000
@@ -11,7 +12,7 @@ config.Data.splitting       = 'EventAwareLumiBased'
 
 config.Data.useParent       = True #!!!!
 
-config.Site.storageSite     = 'T2_CH_CERN'
+config.Site.storageSite     = 'T3_US_TAMU'
 config.JobType.numCores     = 4
 
 if __name__ == '__main__':
@@ -25,7 +26,7 @@ if __name__ == '__main__':
     # We want to put all the CRAB project directories from the tasks we submit here into one common directory.
     # That's why we need to set this parameter (here or above in the configuration file, it does not matter, we will not overwrite it).
     config.General.workArea   = tag
-    config.Data.outLFNDirBase = '/store/group/phys_muon/folguera/13TeV/MC/' + tag
+    config.Data.outLFNDirBase = '/store/user/wshi/' + tag
 
     def submit(config):
         try:
