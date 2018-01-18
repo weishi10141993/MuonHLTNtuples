@@ -190,8 +190,9 @@ void readNtuplesPrefilter_OIOnly(TString inputfilename="/afs/cern.ch/work/w/wshi
   for (Int_t eventNo=0; eventNo < nentries; eventNo++) 
     {
       Int_t IgetEvent   = tree   -> GetEvent(eventNo); 
+      std::cout<<"Printing progress bar..."<<std::endl;
       printProgBar((int)(eventNo*100./nentries));
-    
+      std::cout<<"Finding hlt..."<<std::endl;
 
       if (!ev-> hlt.find(hltname)) continue;
       hltfired++;
