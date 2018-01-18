@@ -1,5 +1,3 @@
-
-
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TFile.h"
@@ -197,6 +195,7 @@ void readNtuplesPrefilter_OIOnly(TString inputfilename="/afs/cern.ch/work/w/wshi
 
       if (!ev-> hlt.find(hltname)) continue;
       hltfired++;
+      cout<<">>>HLT fired<<<"<<endl;
       n_passing_events -> Fill(0.5);
 
       unsigned int nmuons = ev->muons.size(); 
