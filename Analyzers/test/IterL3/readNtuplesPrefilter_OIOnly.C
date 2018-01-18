@@ -41,7 +41,7 @@ double offlineIsoCut = 0.15;
 // ******************************************
 //                                          *
 //                                          *
-std::string hltname        = "HLT_IsoMu27_v12"; 
+std::string hltname        = "HLT_IsoMu27_v14"; 
 std::string thepassfilter  = L3filter;
 std::string the2016filter  = "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07::HLT";
 std::string theprobefilter = L1filter; 
