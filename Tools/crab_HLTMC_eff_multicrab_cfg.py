@@ -38,9 +38,9 @@ if __name__ == '__main__':
     datasets = {}
     
     datasets['DY']        = ('/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/PhaseIFall16DR-FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v1/AODSIM','hltConfig.py')
-    datasets['DY_Zpt']    = ('/DYJetsToLL_M-50_Zpt-150toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/PhaseIFall16DR-FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v1/AODSIM','hltConfig.py')    
+    #datasets['DY_Zpt']    = ('/DYJetsToLL_M-50_Zpt-150toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/PhaseIFall16DR-FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v1/AODSIM','hltConfig.py')    
     datasets['Displaced'] = ('/DisplacedSUSY_StopToBL_M-400_CTau-10_TuneCUETP8M1_13TeV_pythia8/PhaseIFall16DR-FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v1/AODSIM','hltConfig.py')
-    datasets['JPsi']      = ('/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/PhaseIFall16DR-FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v1/AODSIM', 'hltConfig.py')
+    #datasets['JPsi']      = ('/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/PhaseIFall16DR-FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v1/AODSIM', 'hltConfig.py')
 
     for k, v in datasets.iteritems():
         print v[0]
