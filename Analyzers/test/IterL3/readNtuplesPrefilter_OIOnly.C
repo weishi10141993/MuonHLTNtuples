@@ -195,17 +195,17 @@ void readNtuplesPrefilter_OIOnly(TString inputfilename="/afs/cern.ch/work/w/wshi
       printProgBar((int)(eventNo*100./nentries));
     
 
-      // if (!ev-> hlt.find(hltname)) continue;
-      // hltfired++;
-      // n_passing_events -> Fill(0.5);
+      if (!ev-> hlt.find(hltname)) continue;
+      hltfired++;
+      n_passing_events -> Fill(0.5);
 
       unsigned int nmuons = ev->muons.size(); 
       if (nmuons < 2) continue;
       unsigned int nhltmuons = ev->hltmuons.size(); 
         
-      //if (!ev-> hltTag.find(hltname)) continue;
+      if (!ev-> hltTag.find(hltname)) continue;
 
-      //nvtx_event-> Fill( ev -> nVtx   ); 
+      nvtx_event-> Fill( ev -> nVtx   ); 
 
       for (int imu = 0; imu < nmuons; imu++){ 
 
