@@ -50,7 +50,7 @@ float offlinePtCut         = 30.;
 //                                          *
 // ******************************************
 
-void readNtuplesPrefilter_OIOnly(TString inputfilename="/afs/cern.ch/user/s/sferrere/private/CMSSW_9_2_7/src/workspace/newIterL3/JSON_16_08/hlt_92X_GT92X_dataRun2_HLT_v4_HitlessAndHits_FixedNavigation_ResetSeeds_HitsToTry1Layer5_muonNtuple_SingleMuon_Run2017C_ZMu-PromptReco-v2.root", std::string effmeasured="Navigation"){
+void readNtuplesPrefilter_OIOnly(TString inputfilename="/afs/cern.ch/work/w/wshi/public/MuHLTIterL3/CMSSW_9_2_15/src/", std::string effmeasured="Navigation"){
 
   bool doingL1 = thepassfilter.find("L1fL1") != std::string::npos; 
 
