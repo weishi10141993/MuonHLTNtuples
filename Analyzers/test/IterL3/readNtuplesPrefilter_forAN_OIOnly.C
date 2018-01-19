@@ -82,7 +82,7 @@ float offlinePtCut         = 28.;
 //                                          *
 // ******************************************
 
-void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="results.root", int flavor=Sig::Prompt,  std::string effmeasured="IterL3_NOHP_NOL1"){
+void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/w/wshi/public/MuHLTIterL3/CMSSW_9_2_15/src/muonNtuple_100.root", int flavor=Sig::Prompt,  std::string effmeasured="IterL3_NOHP_NOL1"){
 
   bool doingL1 = thepassfilter.find("L1fL1") != std::string::npos; 
 
