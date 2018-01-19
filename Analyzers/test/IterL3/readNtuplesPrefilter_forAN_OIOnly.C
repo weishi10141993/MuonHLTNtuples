@@ -180,7 +180,7 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/
     unsigned int nmuons = ev->muons.size(); 
     if (nmuons < 2) continue; 
     nvtx_event->Fill(ev->nVtx); 
-    std::cout << "nmuons: "<< nmuons << std::endl;
+    //std::cout << "nmuons: "<< nmuons << std::endl;
     for (int imu = 0; imu < nmuons; imu++){ 
       // select the tag muon        
       if (debug) cout <<"select Tag muon" << endl;
@@ -358,7 +358,7 @@ bool matchMuon(MuonCand mu, std::vector<HLTObjCand> toc, std::string tagFilterNa
   if (tagFilterName.find("L1fL1") != std::string::npos) minDR = 1.0;
   float theDR = 100;
   for ( std::vector<HLTObjCand>::const_iterator it = toc.begin(); it != toc.end(); ++it ) { 
-    std::cout << "filterTag: " << it->filterTag << std::endl;
+    //std::cout << "filterTag: " << it->filterTag << std::endl;
     if ( it->filterTag.compare(tagFilterName) == 0) { 
       theDR = deltaR(it -> eta, it -> phi, mu.eta, mu.phi);
       if (theDR < minDR){
