@@ -132,9 +132,9 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/
   TH1F* FailingProbeMll         = new TH1F("h_FailingProbeMll"      ,"FailingMuonMll"   ,  20,  86., 96.);
 
   // di-muon efficiencies 
-  TEfficiency* diMuonPt         = new TEfficiency("diMuonPt"      ,"diMuonPt"       ,   16,  pt_bins  , 16,  pt_bins ); 
-  TEfficiency* diMuonEta        = new TEfficiency("diMuonEta"     ,"diMuonEta"      ,   15, eta_bins  , 15, eta_bins );
-  TEfficiency* diMuonPhi        = new TEfficiency("diMuonPhi"     ,"diMuonPhi"      ,   20, -3.2, 3.2 , 20, -3.2, 3.2);
+  //TEfficiency* diMuonPt         = new TEfficiency("diMuonPt"      ,"diMuonPt"       ,   16,  pt_bins  , 16,  pt_bins ); 
+  //TEfficiency* diMuonEta        = new TEfficiency("diMuonEta"     ,"diMuonEta"      ,   15, eta_bins  , 15, eta_bins );
+  //TEfficiency* diMuonPhi        = new TEfficiency("diMuonPhi"     ,"diMuonPhi"      ,   20, -3.2, 3.2 , 20, -3.2, 3.2);
   TEfficiency* diMuonEff        = new TEfficiency("diMuonEff"     ,"diMuonEff"      ,    1,   0., 1.0);
   TEfficiency* diMuonDeltaR     = new TEfficiency("diMuonDeltaR"  ,"diMuonDeltaR"   ,   30,   0., 3.0);
   TEfficiency* diMuonLeadPt     = new TEfficiency("diMuonLeadPt"  ,"diMuonLeadPt"   ,   16,  pt_bins ); 
@@ -262,14 +262,14 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/
 	      matchMuonWithL3(ev->muons.at(imu),ev->hltOImuons)) pass = true;
 	  
 	  double DeltaR = deltaR(ev->muons.at(imu).eta,ev->muons.at(imu).phi,ev->muons.at(jmu).eta,ev->muons.at(jmu).phi);
-	  diMuonPt       -> Fill( pass, ev->muons.at(imu).pt , ev->muons.at(jmu).pt  ); 
+	  //diMuonPt       -> Fill( pass, ev->muons.at(imu).pt , ev->muons.at(jmu).pt  ); 
 	  diMuonLeadPt   -> Fill( pass, ev->muons.at(imu).pt ); 
 	  diMuonTrailPt  -> Fill( pass, ev->muons.at(jmu).pt ); 
 	  
 	  if (ev->muons.at(imu).pt < ptcut1) continue;
 	  if (ev->muons.at(jmu).pt < ptcut2) continue;
-	  diMuonEta      -> Fill( pass, ev->muons.at(imu).eta, ev->muons.at(jmu).eta );
-	  diMuonPhi      -> Fill( pass, ev->muons.at(imu).phi, ev->muons.at(jmu).phi );
+	  //diMuonEta      -> Fill( pass, ev->muons.at(imu).eta, ev->muons.at(jmu).eta );
+	  //diMuonPhi      -> Fill( pass, ev->muons.at(imu).phi, ev->muons.at(jmu).phi );
 	  diMuonDeltaR   -> Fill( pass, DeltaR);
 	  diMuonEff      -> Fill( pass, 0.5);
 	  
