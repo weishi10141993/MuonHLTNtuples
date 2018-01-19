@@ -179,14 +179,16 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="results.root", int
     
     unsigned int nmuons = ev->muons.size(); 
     if (nmuons < 2) continue; 
-    nvtx_event-> Fill( ev -> nVtx   ); 
+    nvtx_event->Fill(ev->nVtx); 
+    std::cout << "nmuons: "<< nmuons << std::endl;
     for (int imu = 0; imu < nmuons; imu++){ 
       // select the tag muon        
       if (debug) cout <<"select Tag muon" << endl;
       if (! selectTagMuon(ev -> muons.at(imu), tagiso)) continue; 
       
       if (! matchMuon(ev -> muons.at(imu), ev -> hltTag.objects, isofilterTag)) continue;
-      tagMuonPt -> Fill ( ev -> muons.at(imu).pt) ; 
+      tagMuonPt->Fill (ev->muons.at(imu).pt);
+      std::cout << "tagMuonPt: "<< ev->muons.at(imu).pt << std::endl;
       
       for (int jmu = 0; jmu < nmuons; jmu++){
 	bool pass   = false;
