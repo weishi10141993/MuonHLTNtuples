@@ -45,7 +45,7 @@ double offlineIsoCut = 0.15;
 
 
 /// TAG-DEFINITION: 
-std::string isofilterTag  = "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07::HLT";
+std::string isofilterTag  = "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p09::HLT";
 
 /// for PROMPT-MUONS   (close-by and far-away) 
 std::string L1filter      = "hltL1fL1sMu22or25L1Filtered0::TEST"; 
