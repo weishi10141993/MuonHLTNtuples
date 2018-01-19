@@ -358,6 +358,7 @@ bool matchMuon(MuonCand mu, std::vector<HLTObjCand> toc, std::string tagFilterNa
   if (tagFilterName.find("L1fL1") != std::string::npos) minDR = 1.0;
   float theDR = 100;
   for ( std::vector<HLTObjCand>::const_iterator it = toc.begin(); it != toc.end(); ++it ) { 
+    std::cout << "filterTag: " << it->filterTag << std::endl;
     if ( it->filterTag.compare(tagFilterName) == 0) { 
       theDR = deltaR(it -> eta, it -> phi, mu.eta, mu.phi);
       if (theDR < minDR){
