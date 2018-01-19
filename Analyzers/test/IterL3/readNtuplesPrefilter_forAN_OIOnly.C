@@ -321,9 +321,9 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/
   FailingProbeMll -> Write();
   
   /// Per-event (di-muon) efficiency.
-  diMuonPt         -> Write();
-  diMuonEta        -> Write();
-  diMuonPhi        -> Write();
+  //diMuonPt         -> Write();
+  //diMuonEta        -> Write();
+  //diMuonPhi        -> Write();
   diMuonEff        -> Write();
   diMuonDeltaR     -> Write();
   diMuonLeadPt     -> Write(); 
@@ -333,7 +333,7 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/
   diMuonTrailEta   -> Write();
   diMuonTrailPhi   -> Write();
   nvtx_event       -> Write();
-//  nvtx             -> Write();
+  //nvtx             -> Write();
   
   dimuon_mass      -> Write();
   tagiso           -> Write();
