@@ -82,6 +82,4 @@ process.HLTValidation = cms.EndPath(
     process.muonDebugger
 )
 
-## Plotter and other Tols
-
-The 
+## Plotter and other Tools
