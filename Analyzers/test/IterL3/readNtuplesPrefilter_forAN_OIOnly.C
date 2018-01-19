@@ -188,7 +188,7 @@ void readNtuplesPrefilter_forAN_OIOnly(TString inputfilename="/afs/cern.ch/work/
       
       if (! matchMuon(ev -> muons.at(imu), ev -> hltTag.objects, isofilterTag)) continue;
       tagMuonPt->Fill (ev->muons.at(imu).pt);
-      std::cout << "tagMuonPt: "<< ev->muons.at(imu).pt << std::endl;
+      //std::cout << "tagMuonPt: "<< ev->muons.at(imu).pt << std::endl;
       
       for (int jmu = 0; jmu < nmuons; jmu++){
 	bool pass   = false;
