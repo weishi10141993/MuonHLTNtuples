@@ -4,7 +4,7 @@ cmsrel CMSSW_9_2_15  (-> update to the appropriate CMSSW version!)
 cd CMSSW_9_2_15/src  
 cmsenv    
 git cms-addpkg HLTrigger/Configuration    
-git clone git@github.com:folguera/MuonHLTNtuples.git    
+git clone git@github.com:weishi10141993/MuonHLTNtuples.git    
 cd MuonHLTNtuples/  
 git checkout -b YOUR_BRANCH_NAME    
 cd ..  
