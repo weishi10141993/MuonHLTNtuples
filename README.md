@@ -37,12 +37,11 @@ Then at the end of it you should add different lines to run the Ntuple-producer 
                        puInfoTag                = cms.untracked.InputTag("addPileupInfo"),
                        genParticlesTag          = cms.untracked.InputTag("genParticles"),
                        doOffline                = cms.untracked.bool(True)
-                       )
-
+    )
     process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("muonNtuple.root"),
                                    closeFileFast = cms.untracked.bool(False)
-                                   )
+    )
     process.HLTValidation = cms.EndPath(
         process.muonNtuples
     )
@@ -71,13 +70,11 @@ You need to add the following lines at the end of your configuration file:
                                      l3filterLabel   = cms.string("hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q"),
                                      debuglevel      = cms.untracked.uint32(0),
                                      isMC            = cms.untracked.bool(True)
-                                     )
-
+    )
     process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("muonDebugger_MC_IterL3.root"),
                                    closeFileFast = cms.untracked.bool(False)
-                                   )
-
+    )
     process.HLTValidation = cms.EndPath(
         process.muonDebugger
     )
