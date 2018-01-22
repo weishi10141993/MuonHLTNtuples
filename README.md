@@ -69,7 +69,8 @@ You need to add the following lines at the end of your configuration file:
                                      l2filterLabel   = cms.string("hltL2fL1sMu22Or25L1f0L2Filtered10Q"),
                                      l3filterLabel   = cms.string("hltL3fL1sMu22Or25L1f0L2f10QL3Filtered50Q"),
                                      debuglevel      = cms.untracked.uint32(0),
-                                     isMC            = cms.untracked.bool(True)
+                                     isMC            = cms.untracked.bool(True),
+                                     runSharedHits = cms.untracked.bool(False)
     )
     process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("muonDebugger_MC_IterL3.root"),
