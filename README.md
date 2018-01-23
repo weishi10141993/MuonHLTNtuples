@@ -53,6 +53,7 @@ First thing to do is to download a configuration file with the desired HLT paths
 
 `hltGetConfiguration /online/collisions/2017/2e34/v4.2/HLT/V6 --input file:/store/mc/PhaseISpring17DR/SingleMu_Pt1To1000_FlatRandomOneOverPt/AODSIM/NoPUNZS_90X_upgrade2017_realistic_v20-v1/100000/0404BCB7-0234-E711-8A42-001E67DDC0FB.root  --paths HLTriggerFirstPath,HLT_IsoMu27_v14,HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v13,HLT_Mu50_v12,HLT_DoubleMu43NoFiltersNoVtx_v3,HLT_Dimuon25_Jpsi_v13,DST_DoubleMu3_noVtx_CaloScouting_v5,HLTriggerFinalPath --output none --full --offline --mc --unprescale --process TEST --globaltag auto:run2_hlt_GRun > hltConfig.py`
 
+Add secondary files[https://cmsweb.cern.ch/das/request?input=parent%20file%3D/store/mc/PhaseISpring17DR/SingleMu_Pt1To1000_FlatRandomOneOverPt/AODSIM/NoPUNZS_90X_upgrade2017_realistic_v20-v1/100000/0404BCB7-0234-E711-8A42-001E67DDC0FB.root&instance=prod/global&idx=0&limit=10]
 Then at the end of it you should add different lines to run the Debugger: 
 
 You need to add the following lines at the end of your configuration file: 
