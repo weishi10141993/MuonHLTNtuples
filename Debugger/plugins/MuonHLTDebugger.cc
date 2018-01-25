@@ -327,9 +327,10 @@ MuonHLTDebugger::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     iEvent.getByToken(genToken_, genParticles);
   }
 
-  if (debuglevel_ > 1)
+  if (debuglevel_ > 1){
     cout << "#####################################################################################" << endl;
     cout << "[EVENT] Run:Event --> " << iEvent.id().run() << " : " << iEvent.id().event() << endl;
+  }
   
   //########################### Trigger Info ###########################
   // Get objects from the event.  
