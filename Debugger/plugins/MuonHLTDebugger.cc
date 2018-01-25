@@ -176,7 +176,7 @@ private:
   unsigned int debuglevel_;
   bool isMC_;
   bool runSharedHits_;
-  bool UseGenInfo_;
+  // bool UseGenInfo_;
   // Trigger indexes
   int tagTriggerIndex_;
   int triggerIndex_;
@@ -260,7 +260,7 @@ MuonHLTDebugger::MuonHLTDebugger(const edm::ParameterSet& cfg):
   debuglevel_             (cfg.getUntrackedParameter<unsigned int>("debuglevel")),
   isMC_                   (cfg.getUntrackedParameter<bool>("isMC")),
   runSharedHits_          (cfg.getUntrackedParameter<bool>("runSharedHits")),
-  UseGenInfo_             (cfg.getUntrackedParameter<bool>("UseGenInfo")),
+  //  UseGenInfo_             (cfg.getUntrackedParameter<bool>("UseGenInfo")),
   //  theOITracksToken_       (consumes<reco::TrackCollection>(edm::InputTag("hltIterL3OIMuCtfWithMaterialTracks","","TEST"))),
   //  thePixelTracksIter0Token_ (mayConsume<reco::TrackCollection>(edm::InputTag("hltIter0IterL3MuonPixelSeedsFromPixelTracks","","TEST"))),
   //  theSeedsIter0Token_     (mayConsume<TrajectorySeedCollection>(edm::InputTag("hltIter0IterL3MuonPixelSeedsFromPixelTracks","","TEST"))),
