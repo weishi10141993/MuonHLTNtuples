@@ -55,7 +55,7 @@ First thing to do is to download a configuration file with the desired HLT paths
 
 For MC, be sure for each input file above, put its parent files as secondary files in the hlt config. In this case of [AODSIM](https://cmsweb.cern.ch/das/request?input=file%3D%2Fstore%2Fmc%2FRunIISummer17DRStdmix%2FSingleMu_Pt1To1000_FlatRandomOneOverPt%2FAODSIM%2FNZSNoPU_92X_upgrade2017_realistic_v10-v2%2F10000%2F06AAD71C-829F-E711-9B00-6CC2173C39E0.root&instance=prod%2Fglobal), its parent file are [GEN-SIM-RAW](https://cmsweb.cern.ch/das/request?input=parent%20file%3D/store/mc/RunIISummer17DRStdmix/SingleMu_Pt1To1000_FlatRandomOneOverPt/AODSIM/NZSNoPU_92X_upgrade2017_realistic_v10-v2/10000/06AAD71C-829F-E711-9B00-6CC2173C39E0.root&instance=prod/global&idx=0&limit=10).
 
-You might also want to rerun L1 since the sample is old:
+You might also want to rerun L1 if the sample is old:
 
 `hltGetConfiguration /online/collisions/2017/2e34/v4.2/HLT/V6 --input /store/mc/PhaseISpring17DR/SingleMu_Pt1To1000_FlatRandomOneOverPt/AODSIM/NoPUNZS_90X_upgrade2017_realistic_v20-v1/100000/1E005F72-0234-E711-99EA-0CC47A7C346E.root --paths HLTriggerFirstPath,HLT_IsoMu27_v14,HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v13,HLT_Mu50_v12,HLT_DoubleMu43NoFiltersNoVtx_v3,HLT_Dimuon25_Jpsi_v13,DST_DoubleMu3_noVtx_CaloScouting_v5,HLTriggerFinalPath --output none --full --offline --mc --unprescale --process TEST --globaltag 92X_upgrade2017_TSG_For90XSamples_V2 --l1-emulator FullMC --l1 L1Menu_Collisions2017_v4 --max-events 100 > hltConfig_debugger_mc.py`
 
